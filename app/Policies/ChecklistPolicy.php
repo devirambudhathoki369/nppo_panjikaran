@@ -1,0 +1,76 @@
+<?php
+
+namespace App\Policies;
+
+use App\Models\Checklist;
+use App\Models\User;
+use Illuminate\Auth\Access\Response;
+
+class ChecklistPolicy
+{
+    /**
+     * Determine whether the user can view any models.
+     */
+    public function viewAny(User $user): bool
+    {
+        return false;
+    }
+
+    /**
+     * Determine whether the user can view the model.
+     */
+    public function view(User $user, Checklist $checklist): bool
+    {
+        return false;
+    }
+
+    /**
+     * Determine whether the user can create models.
+     */
+    public function create(User $user): bool
+    {
+        return false;
+    }
+
+    /**
+     * Determine whether the user can update the model.
+     */
+    public function update(User $user, Checklist $checklist): bool
+    {
+        return false;
+    }
+
+    /**
+     * Determine whether the user can delete the model.
+     */
+    public function delete(User $user, Checklist $checklist): bool
+    {
+        return false;
+    }
+
+    /**
+     * Determine whether the user can restore the model.
+     */
+    public function restore(User $user, Checklist $checklist): bool
+    {
+        return false;
+    }
+
+    /**
+     * Determine whether the user can permanently delete the model.
+     */
+    public function forceDelete(User $user, Checklist $checklist): bool
+    {
+        return false;
+    }
+
+    public function verify(User $user, Checklist $checklist)
+    {
+        return $user->usertype === 'verifier' && $checklist->Status == 0;
+    }
+
+    public function approve(User $user, Checklist $checklist)
+    {
+        return $user->usertype === 'approver' && $checklist->Status == 1;
+    }
+}

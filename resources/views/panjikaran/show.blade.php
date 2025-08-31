@@ -97,7 +97,7 @@
                                     <h6 class="text-primary border-bottom pb-2">प्रयोग विवरण</h6>
                                 </div>
                                 <div class="col-md-6 mb-3">
-                                    <strong>डप्पर मात्रा:</strong>
+                                    <strong>जीवनाशक विषादीको प्रभावक मात्रा:</strong>
                                     <p>{{ $panjikaran->DapperQuantity ?? 'N/A' }}</p>
                                 </div>
                                 <div class="col-md-6 mb-3">

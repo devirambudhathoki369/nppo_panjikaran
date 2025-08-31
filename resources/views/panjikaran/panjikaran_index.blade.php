@@ -71,7 +71,7 @@
                                             class="btn btn-success btn-xs" title="सम्पादन गर्नुहोस्">
                                             <i class="bx bx-edit"></i>
                                         </a>
-                                        <a href="{{ route('bargikarans.index', ['panjikaran_id' => $panjikaran->id]) }}"
+                                        {{-- <a href="{{ route('bargikarans.index', ['panjikaran_id' => $panjikaran->id]) }}"
                                             class="btn btn-warning btn-xs" title="वर्गीकरण">
                                             <i class="fa fa-list"></i>
                                         </a>
@@ -82,7 +82,7 @@
                                         <a href="{{ route('recommended-pests.index', ['panjikaran_id' => $panjikaran->id]) }}"
                                             class="btn btn-secondary btn-xs" title="सिफारिस गरिएको कीरा">
                                             <i class="fa fa-bug"></i>
-                                        </a>
+                                        </a> --}}
                                         <form action="{{ route('panjikarans.destroy', $panjikaran->id) }}" method="POST"
                                             style="display: inline-block;">
                                             @csrf

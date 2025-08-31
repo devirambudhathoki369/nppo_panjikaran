@@ -284,10 +284,10 @@
         <!-- Pesticide Group Section -->
         <div class="form-section">
             <div class="form-row">
-                <span class="form-label">१०.</span>
-                <span style="margin-right: 20px;">जीवनाशक विषादीको समूह:</span>
-            </div>
-            <div style="margin-left: 30px;">
+    <span class="form-label">१०.</span>
+    <span style="margin-right: 20px;">जीवनाशक विषादीको समूह: {{ $panjikaran->checklist->bishadiType->prakar ?? 'N/A' }}</span>
+</div>
+            {{-- <div style="margin-left: 30px;">
                 <div class="checkbox-group">
                     <div class="checkbox-item">
                         <input type="checkbox"> (क) अर्गानोफस्फेट
@@ -323,7 +323,7 @@
                         <input type="checkbox"> (ट) अन्य .........................
                     </div>
                 </div>
-            </div>
+            </div> --}}
         </div>
 
         <!-- Purpose/Objective Section -->
@@ -349,7 +349,7 @@
             <div class="form-row">
                 <span class="form-label">१३.</span>
                 <span style="margin-right: 20px;">जीवनाशक विषादीको प्रभावक मात्रा ५० (LD₅₀):</span>
-                <span class="form-value">{{ $panjikaran->LD50 ?? '..........' }}</span>
+                <span class="form-value">{{ $panjikaran->DapperQuantity ?? '..........' }} {{ $panjikaran->unit->unit_name }}</span>
             </div>
 
             <div class="form-row">
@@ -381,7 +381,7 @@
             <div class="form-row">
                 <span class="form-label">१७.</span>
                 <span style="margin-right: 20px;">सम्मिश्रण:</span>
-                <span class="form-value">{{ $panjikaran->mixture ?? '..........' }}</span>
+                <span class="form-value">{{ $panjikaran->checklist->formulation->formulation_name ?? '..........' }}</span>
             </div>
 
             <div class="form-row">
@@ -541,18 +541,18 @@
                             <div style="text-decoration: underline; margin-bottom: 15px; font-weight: bold;">पञ्जीकरण गर्ने अधिकारीको</div>
                             <div style="text-decoration: underline; margin-bottom: 15px;">दस्तखत:</div>
                             <div style="height: 40px; margin-bottom: 10px;"></div>
-                            <div style="margin-bottom: 5px;">नाम: ............</div>
-                            <div style="margin-bottom: 5px;">पद: ............</div>
-                            <div>मिति: ..............</div>
+                            <div style="margin-bottom: 5px;">नाम: {{ $panjikaran->checklist->creator->name ?? '............' }}</div>
+                            <div style="margin-bottom: 5px;">पद: {{ $panjikaran->checklist->creator->designation ?? '............' }}</div>
+                            <div>मिति: {{ $panjikaran->checklist->getCreatedDateNepaliAttribute() ?? '..............' }}</div>
                         </div>
 
                         <div style="width: 45%;">
                             <div style="text-decoration: underline; margin-bottom: 15px; font-weight: bold;">स्वीकृत गर्ने अधिकारीको</div>
                             <div style="text-decoration: underline; margin-bottom: 15px;">दस्तखत:</div>
                             <div style="height: 40px; margin-bottom: 10px;"></div>
-                            <div style="margin-bottom: 5px;">नाम: ..............</div>
-                            <div style="margin-bottom: 5px;">पद: ..............</div>
-                            <div>मिति: ..............</div>
+                            <div style="margin-bottom: 5px;">नाम: {{ $panjikaran->checklist->approver->name ?? '..............' }}</div>
+                            <div style="margin-bottom: 5px;">पद: {{ $panjikaran->checklist->approver->designation ?? '..............' }}</div>
+                            <div>मिति: {{ $panjikaran->checklist->getApprovedDateNepaliAttribute() ?? '..............' }}</div>
                         </div>
                     </div>
                 </div>

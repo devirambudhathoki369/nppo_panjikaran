@@ -175,8 +175,8 @@
                                 <div class="form-floating">
                                     <input type="text" class="form-control @error('DapperQuantity') is-invalid @enderror"
                                         name="DapperQuantity" value="{{ old('DapperQuantity') }}"
-                                        placeholder="डप्पर मात्रा">
-                                    <label>डप्पर मात्रा</label>
+                                        placeholder="जीवनाशक विषादीको प्रभावक मात्रा">
+                                    <label>जीवनाशक विषादीको प्रभावक मात्रा</label>
                                     @error('DapperQuantity')
                                         <span class="invalid-feedback">{{ $message }}</span>
                                     @enderror

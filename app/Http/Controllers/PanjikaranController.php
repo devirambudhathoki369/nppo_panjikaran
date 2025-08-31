@@ -25,8 +25,8 @@ class PanjikaranController extends Controller
     {
         // For debugging - let's get all checklists first
         $checklists = Checklist::with(['creator', 'verifier', 'approver', 'formulation', 'bishadiType', 'country'])
-                              ->where('status', '2')->latest()
-                              ->get();
+            ->where('status', '2')->latest()
+            ->get();
 
         // If you want to apply user visibility, uncomment the line below:
         // $checklists = $checklists->where(function($query) { return $query->visibleToUser(); });
@@ -40,8 +40,8 @@ class PanjikaranController extends Controller
     public function index()
     {
         $panjikarans = Panjikaran::with(['checklist', 'source', 'objective', 'usage', 'unit', 'packageDestroy'])
-                                 ->latest()
-                                 ->get();
+            ->latest()
+            ->get();
 
         return view('panjikaran.panjikaran_index', compact('panjikarans'));
     }
@@ -61,19 +61,19 @@ class PanjikaranController extends Controller
 
         // Get data for each step
         $bargikarans = Bargikaran::with(['checklist', 'panjikaran'])
-                                ->where('panjikaran_id', $panjikaran->id)
-                                ->latest()
-                                ->get();
+            ->where('panjikaran_id', $panjikaran->id)
+            ->latest()
+            ->get();
 
         $recommendedCrops = RecommendedCrop::with(['checklist', 'panjikaran', 'crop'])
-                                         ->where('panjikaran_id', $panjikaran->id)
-                                         ->latest()
-                                         ->get();
+            ->where('panjikaran_id', $panjikaran->id)
+            ->latest()
+            ->get();
 
         $recommendedPests = RecommendedPest::with(['checklist', 'panjikaran', 'pest'])
-                                         ->where('panjikaran_id', $panjikaran->id)
-                                         ->latest()
-                                         ->get();
+            ->where('panjikaran_id', $panjikaran->id)
+            ->latest()
+            ->get();
 
         // Get dropdown data
         $crops = Crop::all();
@@ -109,8 +109,13 @@ class PanjikaranController extends Controller
         $packageDestroys = PackageDestroy::all();
 
         return view('panjikaran.create', compact(
-            'checklist', 'checklistId', 'sources', 'objectives',
-            'usages', 'units', 'packageDestroys'
+            'checklist',
+            'checklistId',
+            'sources',
+            'objectives',
+            'usages',
+            'units',
+            'packageDestroys'
         ));
     }
 
@@ -187,8 +192,13 @@ class PanjikaranController extends Controller
         $packageDestroys = PackageDestroy::all();
 
         return view('panjikaran.edit', compact(
-            'panjikaran', 'sources', 'objectives',
-            'usages', 'units', 'checklist', 'packageDestroys'
+            'panjikaran',
+            'sources',
+            'objectives',
+            'usages',
+            'units',
+            'checklist',
+            'packageDestroys'
         ));
     }
 
@@ -250,6 +260,7 @@ class PanjikaranController extends Controller
             'checklist.check_list_formulations.common_name',
             'checklist.check_list_formulations.formulation',
             'checklist.check_list_formulations.unit',
+            'checklist.bishadiType',
             'source',
             'objective',
             'usage',
@@ -319,7 +330,7 @@ class PanjikaranController extends Controller
                     $query->where('PackageDestroyID', $filterValue);
                     break;
                 case 'country':
-                    $query->whereHas('checklist', function($q) use ($filterValue) {
+                    $query->whereHas('checklist', function ($q) use ($filterValue) {
                         $q->where('CountryID', $filterValue);
                     });
                     break;

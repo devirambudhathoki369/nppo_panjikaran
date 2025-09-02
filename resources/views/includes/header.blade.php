@@ -113,7 +113,7 @@
                     <a class="dropdown-item dropdown-footer" title="Notifications"
                         href="{{ route('dataentry.checklists.notifications') }}">
                         <i class="nav-icon fas fa-bell"></i>
-                        सूचनाहरू
+                        Notification
                         @php
                             $unreadCount = 0;
                             if (class_exists('App\Models\Notification')) {

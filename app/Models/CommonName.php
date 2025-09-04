@@ -11,5 +11,16 @@ class CommonName extends Model
 
     protected $fillable = [
         'common_name',
+        'rasayanik_name',
+        'iupac_name',
+        'cas_no',
+        'molecular_formula',
+        'source_id',
     ];
+
+    // Relationship with Source model
+    public function source()
+    {
+        return $this->belongsTo(Source::class, 'source_id');
+    }
 }

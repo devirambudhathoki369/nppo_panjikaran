@@ -39,11 +39,22 @@ class PanjikaranController extends Controller
      */
     public function index()
     {
-        $panjikarans = Panjikaran::with(['checklist', 'source', 'objective', 'usage', 'unit', 'packageDestroy'])
-            ->latest()
-            ->get();
+        $query = Panjikaran::with(['checklist', 'source', 'objective', 'usage', 'unit', 'packageDestroy']);
 
-        return view('panjikaran.panjikaran_index', compact('panjikarans'));
+        // Filter by checklist_id if provided
+        if (request()->has('checklist_id') && request('checklist_id')) {
+            $query->where('ChecklistID', request('checklist_id'));
+        }
+
+        $panjikarans = $query->latest()->get();
+
+        // Get the checklist for display purposes (if filtering by checklist_id)
+        $checklist = null;
+        if (request('checklist_id')) {
+            $checklist = Checklist::find(request('checklist_id'));
+        }
+
+        return view('panjikaran.panjikaran_index', compact('panjikarans', 'checklist'));
     }
 
     /**
@@ -53,11 +64,20 @@ class PanjikaranController extends Controller
     {
         $currentStep = $request->get('step', 1);
 
-        // Ensure step is between 1 and 3 (steps 1-3 only, after step 3 redirect to show)
-        $currentStep = max(1, min(3, intval($currentStep)));
+        // Ensure step is between 1 and 5 (extended to 5 steps)
+        $currentStep = max(1, min(5, intval($currentStep)));
 
         // Load panjikaran with necessary relationships
-        $panjikaran->load(['checklist', 'source', 'objective', 'usage', 'unit', 'packageDestroy']);
+        $panjikaran->load([
+            'checklist.check_list_formulations.common_name.source',
+            'checklist.check_list_formulations.formulation',
+            'checklist.check_list_formulations.unit',
+            'source',
+            'objective',
+            'usage',
+            'unit',
+            'packageDestroy'
+        ]);
 
         // Get data for each step
         $bargikarans = Bargikaran::with(['checklist', 'panjikaran'])
@@ -75,6 +95,16 @@ class PanjikaranController extends Controller
             ->latest()
             ->get();
 
+        // Get HCS Details for step 4
+        $hcsDetails = \App\Models\HcsDetail::where('panjikaran_id', $panjikaran->id)
+            ->latest()
+            ->get();
+
+        // Get NNSW Details for step 5
+        $nnswDetails = \App\Models\NnswDetail::where('panjikaran_id', $panjikaran->id)
+            ->latest()
+            ->get();
+
         // Get dropdown data
         $crops = Crop::all();
         $pests = Pest::all();
@@ -85,6 +115,8 @@ class PanjikaranController extends Controller
             'bargikarans',
             'recommendedCrops',
             'recommendedPests',
+            'hcsDetails',
+            'nnswDetails',
             'crops',
             'pests'
         ));
@@ -99,7 +131,8 @@ class PanjikaranController extends Controller
         $checklist = null;
 
         if ($checklistId) {
-            $checklist = Checklist::findOrFail($checklistId);
+            $checklist = Checklist::with(['check_list_formulations.common_name.source'])
+                ->findOrFail($checklistId);
         }
 
         $sources = Source::all();
@@ -126,11 +159,12 @@ class PanjikaranController extends Controller
     {
         $request->validate([
             'ChecklistID' => 'required|exists:checklists,id',
-            'ChemicalName' => 'required|string|max:200',
-            'IUPAC_Name' => 'nullable|string',
-            'Cas_No' => 'nullable|string|max:20',
-            'Atomic_Formula' => 'nullable|string|max:100',
-            'SourceID' => 'required|exists:sources,id',
+            // Removed redundant fields that are in common_names table:
+            // 'ChemicalName' => 'required|string|max:200',
+            // 'IUPAC_Name' => 'nullable|string',
+            // 'Cas_No' => 'nullable|string|max:20',
+            // 'Atomic_Formula' => 'nullable|string|max:100',
+            // 'SourceID' => 'required|exists:sources,id',
             'ObjectiveID' => 'required|exists:objectives,id',
             'UsageID' => 'required|exists:usages,id',
             'DapperQuantity' => 'nullable|string|max:255',
@@ -160,7 +194,7 @@ class PanjikaranController extends Controller
 
         $panjikaran = Panjikaran::create($request->all());
 
-        // Redirect to workflow after creation
+        // Redirect to workflow after creation instead of index
         return redirect()->route('panjikaran.workflow', $panjikaran->id)->with('success', 'पञ्जीकरण सफलतापूर्वक थपियो!');
     }
 
@@ -182,7 +216,11 @@ class PanjikaranController extends Controller
         $checklist = null;
 
         if ($checklistId) {
-            $checklist = Checklist::findOrFail($checklistId);
+            $checklist = Checklist::with(['check_list_formulations.common_name.source'])
+                ->findOrFail($checklistId);
+        } else {
+            // Load checklist from panjikaran if not provided in request
+            $checklist = $panjikaran->checklist()->with(['check_list_formulations.common_name.source'])->first();
         }
 
         $sources = Source::all();
@@ -208,11 +246,12 @@ class PanjikaranController extends Controller
     public function update(Request $request, Panjikaran $panjikaran)
     {
         $request->validate([
-            'ChemicalName' => 'required|string|max:200',
-            'IUPAC_Name' => 'nullable|string',
-            'Cas_No' => 'nullable|string|max:20',
-            'Atomic_Formula' => 'nullable|string|max:100',
-            'SourceID' => 'required|exists:sources,id',
+            // Removed redundant fields that are in common_names table:
+            // 'ChemicalName' => 'required|string|max:200',
+            // 'IUPAC_Name' => 'nullable|string',
+            // 'Cas_No' => 'nullable|string|max:20',
+            // 'Atomic_Formula' => 'nullable|string|max:100',
+            // 'SourceID' => 'required|exists:sources,id',
             'ObjectiveID' => 'required|exists:objectives,id',
             'UsageID' => 'required|exists:usages,id',
             'DapperQuantity' => 'nullable|string|max:255',
@@ -242,7 +281,8 @@ class PanjikaranController extends Controller
 
         $panjikaran->update($request->all());
 
-        return redirect()->route('panjikarans.index')->with('success', 'पञ्जीकरण सफलतापूर्वक अपडेट भयो!');
+        // Redirect to workflow after update instead of index
+        return redirect()->route('panjikaran.workflow', $panjikaran->id)->with('success', 'पञ्जीकरण सफलतापूर्वक अपडेट भयो!');
     }
 
     /**

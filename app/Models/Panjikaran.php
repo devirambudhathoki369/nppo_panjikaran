@@ -97,4 +97,14 @@ class Panjikaran extends Model
     {
         return $this->hasMany(RecommendedPest::class, 'panjikaran_id');
     }
+
+    public function hcsDetails()
+    {
+        return $this->hasMany(HcsDetail::class, 'panjikaran_id');
+    }
+
+    public function nnswDetails()
+    {
+        return $this->hasMany(NnswDetail::class, 'panjikaran_id');
+    }
 }

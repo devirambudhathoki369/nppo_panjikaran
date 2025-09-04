@@ -230,26 +230,47 @@ Route::middleware(['auth'])->group(function () {
 
 
     Route::get('/bargikarans', [BargikaranController::class, 'index'])->name('bargikarans.index');
-        Route::post('/bargikarans', [BargikaranController::class, 'store'])->name('bargikarans.store');
-        Route::get('/bargikarans/{bargikaran}', [BargikaranController::class, 'show'])->name('bargikarans.show');
-        Route::get('/bargikarans/{bargikaran}/edit', [BargikaranController::class, 'edit'])->name('bargikarans.edit');
-        Route::put('/bargikarans/{bargikaran}', [BargikaranController::class, 'update'])->name('bargikarans.update');
-        Route::delete('/bargikarans/{bargikaran}', [BargikaranController::class, 'destroy'])->name('bargikarans.destroy');
-    });
+    Route::post('/bargikarans', [BargikaranController::class, 'store'])->name('bargikarans.store');
+    Route::get('/bargikarans/{bargikaran}', [BargikaranController::class, 'show'])->name('bargikarans.show');
+    Route::get('/bargikarans/{bargikaran}/edit', [BargikaranController::class, 'edit'])->name('bargikarans.edit');
+    Route::put('/bargikarans/{bargikaran}', [BargikaranController::class, 'update'])->name('bargikarans.update');
+    Route::delete('/bargikarans/{bargikaran}', [BargikaranController::class, 'destroy'])->name('bargikarans.destroy');
+});
 
-    Route::get('/recommended-crops', [RecommendedCropController::class, 'index'])->name('recommended-crops.index');
-    Route::post('/recommended-crops', [RecommendedCropController::class, 'store'])->name('recommended-crops.store');
-    Route::get('/recommended-crops/{recommendedCrop}', [RecommendedCropController::class, 'show'])->name('recommended-crops.show');
-    Route::get('/recommended-crops/{recommendedCrop}/edit', [RecommendedCropController::class, 'edit'])->name('recommended-crops.edit');
-    Route::put('/recommended-crops/{recommendedCrop}', [RecommendedCropController::class, 'update'])->name('recommended-crops.update');
-    Route::delete('/recommended-crops/{recommendedCrop}', [RecommendedCropController::class, 'destroy'])->name('recommended-crops.destroy');
+Route::get('/recommended-crops', [RecommendedCropController::class, 'index'])->name('recommended-crops.index');
+Route::post('/recommended-crops', [RecommendedCropController::class, 'store'])->name('recommended-crops.store');
+Route::get('/recommended-crops/{recommendedCrop}', [RecommendedCropController::class, 'show'])->name('recommended-crops.show');
+Route::get('/recommended-crops/{recommendedCrop}/edit', [RecommendedCropController::class, 'edit'])->name('recommended-crops.edit');
+Route::put('/recommended-crops/{recommendedCrop}', [RecommendedCropController::class, 'update'])->name('recommended-crops.update');
+Route::delete('/recommended-crops/{recommendedCrop}', [RecommendedCropController::class, 'destroy'])->name('recommended-crops.destroy');
 
 
-    Route::get('/recommended-pests', [RecommendedPestController::class, 'index'])->name('recommended-pests.index');
-    Route::post('/recommended-pests', [RecommendedPestController::class, 'store'])->name('recommended-pests.store');
-    Route::get('/recommended-pests/{recommendedPest}', [RecommendedPestController::class, 'show'])->name('recommended-pests.show');
-    Route::get('/recommended-pests/{recommendedPest}/edit', [RecommendedPestController::class, 'edit'])->name('recommended-pests.edit');
-    Route::put('/recommended-pests/{recommendedPest}', [RecommendedPestController::class, 'update'])->name('recommended-pests.update');
-    Route::delete('/recommended-pests/{recommendedPest}', [RecommendedPestController::class, 'destroy'])->name('recommended-pests.destroy');
+Route::get('/recommended-pests', [RecommendedPestController::class, 'index'])->name('recommended-pests.index');
+Route::post('/recommended-pests', [RecommendedPestController::class, 'store'])->name('recommended-pests.store');
+Route::get('/recommended-pests/{recommendedPest}', [RecommendedPestController::class, 'show'])->name('recommended-pests.show');
+Route::get('/recommended-pests/{recommendedPest}/edit', [RecommendedPestController::class, 'edit'])->name('recommended-pests.edit');
+Route::put('/recommended-pests/{recommendedPest}', [RecommendedPestController::class, 'update'])->name('recommended-pests.update');
+Route::delete('/recommended-pests/{recommendedPest}', [RecommendedPestController::class, 'destroy'])->name('recommended-pests.destroy');
+
+// HCS Details Routes
+Route::post('/hcs-details', [App\Http\Controllers\HcsDetailController::class, 'store'])->name('hcs-details.store');
+Route::get('/hcs-details/{hcsDetail}/edit', [App\Http\Controllers\HcsDetailController::class, 'edit'])->name('hcs-details.edit');
+Route::put('/hcs-details/{hcsDetail}', [App\Http\Controllers\HcsDetailController::class, 'update'])->name('hcs-details.update');
+Route::delete('/hcs-details/{hcsDetail}', [App\Http\Controllers\HcsDetailController::class, 'destroy'])->name('hcs-details.destroy');
+
+// NNSW Details Routes
+Route::post('/nnsw-details', [App\Http\Controllers\NnswDetailController::class, 'store'])->name('nnsw-details.store');
+Route::get('/nnsw-details/{nnswDetail}/edit', [App\Http\Controllers\NnswDetailController::class, 'edit'])->name('nnsw-details.edit');
+Route::put('/nnsw-details/{nnswDetail}', [App\Http\Controllers\NnswDetailController::class, 'update'])->name('nnsw-details.update');
+Route::delete('/nnsw-details/{nnswDetail}', [App\Http\Controllers\NnswDetailController::class, 'destroy'])->name('nnsw-details.destroy');
+
+// Renewal Routes
+Route::get('/renewals', [App\Http\Controllers\RenewalController::class, 'index'])->name('renewals.index');
+Route::get('/renewals/create', [App\Http\Controllers\RenewalController::class, 'create'])->name('renewals.create');
+Route::post('/renewals', [App\Http\Controllers\RenewalController::class, 'store'])->name('renewals.store');
+Route::get('/renewals/{renewal}', [App\Http\Controllers\RenewalController::class, 'show'])->name('renewals.show');
+Route::get('/renewals/{renewal}/edit', [App\Http\Controllers\RenewalController::class, 'edit'])->name('renewals.edit');
+Route::put('/renewals/{renewal}', [App\Http\Controllers\RenewalController::class, 'update'])->name('renewals.update');
+Route::delete('/renewals/{renewal}', [App\Http\Controllers\RenewalController::class, 'destroy'])->name('renewals.destroy');
 
 require __DIR__ . '/auth.php';

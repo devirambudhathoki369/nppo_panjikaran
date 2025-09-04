@@ -21,13 +21,13 @@ class BargikaranController extends Controller
         if ($panjikaranId) {
             $panjikaran = Panjikaran::with('checklist')->findOrFail($panjikaranId);
             $bargikarans = Bargikaran::with(['checklist', 'panjikaran'])
-                                    ->where('panjikaran_id', $panjikaranId)
-                                    ->latest()
-                                    ->get();
+                ->where('panjikaran_id', $panjikaranId)
+                ->latest()
+                ->get();
         } else {
             $bargikarans = Bargikaran::with(['checklist', 'panjikaran'])
-                                    ->latest()
-                                    ->get();
+                ->latest()
+                ->get();
         }
 
         return view('bargikaran.index', compact('bargikarans', 'panjikaran', 'panjikaranId'));
@@ -57,11 +57,11 @@ class BargikaranController extends Controller
         // Check if request comes from workflow
         if ($request->has('from_workflow')) {
             return redirect()->route('panjikaran.workflow', ['panjikaran' => $request->panjikaran_id, 'step' => 1])
-                           ->with('success', 'वर्गीकरण सफलतापूर्वक थपियो!');
+                ->with('success', 'वर्गीकरण सफलतापूर्वक थपियो!');
         }
 
         return redirect()->route('bargikarans.index', ['panjikaran_id' => $request->panjikaran_id])
-                        ->with('success', 'वर्गीकरण सफलतापूर्वक थपियो!');
+            ->with('success', 'वर्गीकरण सफलतापूर्वक थपियो!');
     }
 
     /**
@@ -99,11 +99,11 @@ class BargikaranController extends Controller
         // Check if request comes from workflow
         if ($request->has('from_workflow')) {
             return redirect()->route('panjikaran.workflow', ['panjikaran' => $bargikaran->panjikaran_id, 'step' => 1])
-                           ->with('success', 'वर्गीकरण सफलतापूर्वक अपडेट भयो!');
+                ->with('success', 'वर्गीकरण सफलतापूर्वक अपडेट भयो!');
         }
 
         return redirect()->route('bargikarans.index', ['panjikaran_id' => $bargikaran->panjikaran_id])
-                        ->with('success', 'वर्गीकरण सफलतापूर्वक अपडेट भयो!');
+            ->with('success', 'वर्गीकरण सफलतापूर्वक अपडेट भयो!');
     }
 
     /**
@@ -119,10 +119,10 @@ class BargikaranController extends Controller
         // Check if request comes from workflow
         if ($fromWorkflow) {
             return redirect()->route('panjikaran.workflow', ['panjikaran' => $panjikaranId, 'step' => 1])
-                           ->with('success', 'वर्गीकरण सफलतापूर्वक मेटाइयो!');
+                ->with('success', 'वर्गीकरण सफलतापूर्वक मेटाइयो!');
         }
 
         return redirect()->route('bargikarans.index', ['panjikaran_id' => $panjikaranId])
-                        ->with('success', 'वर्गीकरण सफलतापूर्वक मेटाइयो!');
+            ->with('success', 'वर्गीकरण सफलतापूर्वक मेटाइयो!');
     }
 }

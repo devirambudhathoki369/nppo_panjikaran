@@ -27,7 +27,7 @@
                             <div class="d-flex justify-content-between align-items-center mb-4">
                                 <h5 class="card-title">पञ्जीकरण ID: {{ $panjikaran->id }}</h5>
                                 <div>
-                                    <a href="{{ route('panjikaran.workflow', ['panjikaran' => $panjikaran->id, 'step' => 3]) }}"
+                                    <a href="{{ route('panjikaran.workflow', ['panjikaran' => $panjikaran->id, 'step' => 5]) }}"
                                         class="btn btn-outline-primary btn-sm">
                                         <i class="fa fa-arrow-left"></i> कार्यप्रवाहमा फर्कनुहोस्
                                     </a>
@@ -45,41 +45,51 @@
                                 </div>
                             </div>
 
-                            <!-- Basic Information -->
-                            <div class="row mb-4">
-                                <div class="col-12">
-                                    <h6 class="text-primary border-bottom pb-2">आधारभूत जानकारी</h6>
+                            <!-- Common Names from Checklist -->
+                            @if($panjikaran->checklist && $panjikaran->checklist->check_list_formulations->count() > 0)
+                                <div class="row mb-4">
+                                    <div class="col-12">
+                                        <h6 class="text-primary border-bottom pb-2">सामान्य नामहरू र रासायनिक विवरण</h6>
+                                    </div>
+                                    <div class="col-12">
+                                        <div class="table-responsive">
+                                            <table class="table table-bordered table-sm">
+                                                <thead class="table-light">
+                                                    <tr>
+                                                        <th>सामान्य नाम</th>
+                                                        <th>रासायनिक नाम</th>
+                                                        <th>IUPAC नाम</th>
+                                                        <th>CAS नम्बर</th>
+                                                        <th>आणविक सूत्र</th>
+                                                        <th>स्रोत</th>
+                                                        <th>फॉर्मुलेशन</th>
+                                                        <th>मात्रा</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    @foreach($panjikaran->checklist->check_list_formulations as $formulation)
+                                                        <tr>
+                                                            <td><strong>{{ $formulation->common_name->common_name ?? 'N/A' }}</strong></td>
+                                                            <td>{{ $formulation->common_name->rasayanik_name ?? 'N/A' }}</td>
+                                                            <td>{{ $formulation->common_name->iupac_name ?? 'N/A' }}</td>
+                                                            <td>{{ $formulation->common_name->cas_no ?? 'N/A' }}</td>
+                                                            <td>{{ $formulation->common_name->molecular_formula ?? 'N/A' }}</td>
+                                                            <td>{{ $formulation->common_name->source->sourcename ?? 'N/A' }}</td>
+                                                            <td>{{ $formulation->formulation->formulation_name ?? 'N/A' }}</td>
+                                                            <td>{{ $formulation->ActiveIngredientValue ?? 'N/A' }} {{ $formulation->unit->unit_name ?? '' }}</td>
+                                                        </tr>
+                                                    @endforeach
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div class="col-md-6 mb-3">
-                                    <strong>कीटनाशकको सामान्य नाम:</strong>
-                                    <p>{{ $panjikaran->CommonNameOfPesticide }}</p>
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <strong>रासायनिक नाम:</strong>
-                                    <p>{{ $panjikaran->ChemicalName }}</p>
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <strong>IUPAC नाम:</strong>
-                                    <p>{{ $panjikaran->IUPAC_Name ?? 'N/A' }}</p>
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <strong>Cas No:</strong>
-                                    <p>{{ $panjikaran->Cas_No ?? 'N/A' }}</p>
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <strong>आणविक सूत्र:</strong>
-                                    <p>{{ $panjikaran->Atomic_Formula ?? 'N/A' }}</p>
-                                </div>
-                            </div>
+                            @endif
 
                             <!-- Categories -->
                             <div class="row mb-4">
                                 <div class="col-12">
                                     <h6 class="text-primary border-bottom pb-2">वर्गीकरण</h6>
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <strong>स्रोत:</strong>
-                                    <p>{{ $panjikaran->source->sourcename ?? 'N/A' }}</p>
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <strong>उद्देश्य:</strong>
@@ -122,8 +132,8 @@
                             <div class="row mb-4">
                                 <div class="col-12">
                                     <div class="d-flex justify-content-between align-items-center">
-                                        <h6 class="text-primary border-bottom pb-2 mb-0">वर्गीकरण व्यवस्थापन</h6>
-                                        <a href="{{ route('bargikarans.index', ['panjikaran_id' => $panjikaran->id]) }}"
+                                        <h6 class="text-primary border-bottom pb-2 mb-0">बिश्व स्वास्थ्य संगठनको वर्गीकरण व्यवस्थापन</h6>
+                                        <a href="{{ route('panjikaran.workflow', ['panjikaran' => $panjikaran->id, 'step' => 1]) }}"
                                             class="btn btn-sm btn-outline-primary">
                                             <i class="fa fa-external-link"></i> विस्तृत हेर्नुहोस्
                                         </a>
@@ -173,7 +183,7 @@
                                 <div class="col-12">
                                     <div class="d-flex justify-content-between align-items-center">
                                         <h6 class="text-success border-bottom pb-2 mb-0">सिफारिस गरिएको बाली व्यवस्थापन</h6>
-                                        <a href="{{ route('recommended-crops.index', ['panjikaran_id' => $panjikaran->id]) }}"
+                                        <a href="{{ route('panjikaran.workflow', ['panjikaran' => $panjikaran->id, 'step' => 2]) }}"
                                             class="btn btn-sm btn-outline-success">
                                             <i class="fa fa-external-link"></i> विस्तृत हेर्नुहोस्
                                         </a>
@@ -221,7 +231,7 @@
                                 <div class="col-12">
                                     <div class="d-flex justify-content-between align-items-center">
                                         <h6 class="text-warning border-bottom pb-2 mb-0">सिफारिस गरिएको कीरा व्यवस्थापन</h6>
-                                        <a href="{{ route('recommended-pests.index', ['panjikaran_id' => $panjikaran->id]) }}"
+                                        <a href="{{ route('panjikaran.workflow', ['panjikaran' => $panjikaran->id, 'step' => 3]) }}"
                                             class="btn btn-sm btn-outline-warning">
                                             <i class="fa fa-external-link"></i> विस्तृत हेर्नुहोस्
                                         </a>
@@ -264,6 +274,114 @@
                                 </div>
                             </div>
 
+                            <!-- HCS Details Section -->
+                            <div class="row mb-4">
+                                <div class="col-12">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <h6 class="text-info border-bottom pb-2 mb-0">H.C.S विवरण व्यवस्थापन</h6>
+                                        <a href="{{ route('panjikaran.workflow', ['panjikaran' => $panjikaran->id, 'step' => 4]) }}"
+                                            class="btn btn-sm btn-outline-info">
+                                            <i class="fa fa-external-link"></i> विस्तृत हेर्नुहोस्
+                                        </a>
+                                    </div>
+                                </div>
+                                <div class="col-12 mt-3">
+                                    @if ($panjikaran->hcsDetails && $panjikaran->hcsDetails->count() > 0)
+                                        <div class="table-responsive">
+                                            <table class="table table-sm table-bordered">
+                                                <thead class="table-light">
+                                                    <tr>
+                                                        <th>S.N.</th>
+                                                        <th>H.C.S कोड</th>
+                                                        <th>शेल्फ लाइफ</th>
+                                                        <th>कर भुक्तानी विवरण</th>
+                                                        <th>मिति</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    @foreach ($panjikaran->hcsDetails->take(5) as $sn => $hcsDetail)
+                                                        <tr>
+                                                            <td>{{ ++$sn }}</td>
+                                                            <td>{{ $hcsDetail->hcs_code }}</td>
+                                                            <td>{{ $hcsDetail->self_life_of_the_product ?? 'N/A' }}</td>
+                                                            <td>{{ Str::limit($hcsDetail->tax_payment_bhauchar_details, 50) ?? 'N/A' }}</td>
+                                                            <td>{{ $hcsDetail->date ? $hcsDetail->date->format('Y-m-d') : 'N/A' }}</td>
+                                                        </tr>
+                                                    @endforeach
+                                                </tbody>
+                                            </table>
+                                            @if ($panjikaran->hcsDetails->count() > 5)
+                                                <p class="text-muted small">
+                                                    <i class="fa fa-info-circle"></i>
+                                                    कुल {{ $panjikaran->hcsDetails->count() }} H.C.S विवरण मध्ये
+                                                    {{ min(5, $panjikaran->hcsDetails->count()) }} देखाइएको छ
+                                                </p>
+                                            @endif
+                                        </div>
+                                    @else
+                                        <div class="alert alert-info">
+                                            <i class="fa fa-info-circle"></i> कुनै H.C.S विवरण डाटा उपलब्ध छैन
+                                        </div>
+                                    @endif
+                                </div>
+                            </div>
+
+                            <!-- NNSW Details Section -->
+                            <div class="row mb-4">
+                                <div class="col-12">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <h6 class="text-secondary border-bottom pb-2 mb-0">NNSW विवरण व्यवस्थापन</h6>
+                                        <a href="{{ route('panjikaran.workflow', ['panjikaran' => $panjikaran->id, 'step' => 5]) }}"
+                                            class="btn btn-sm btn-outline-secondary">
+                                            <i class="fa fa-external-link"></i> विस्तृत हेर्नुहोस्
+                                        </a>
+                                    </div>
+                                </div>
+                                <div class="col-12 mt-3">
+                                    @if ($panjikaran->nnswDetails && $panjikaran->nnswDetails->count() > 0)
+                                        <div class="table-responsive">
+                                            <table class="table table-sm table-bordered">
+                                                <thead class="table-light">
+                                                    <tr>
+                                                        <th>S.N.</th>
+                                                        <th>अनुरोध नं.</th>
+                                                        <th>अनुरोध मिति</th>
+                                                        <th>कम्पनी कोड</th>
+                                                        <th>स्वीकृति नं.</th>
+                                                        <th>स्वीकृति मिति</th>
+                                                        <th>वैधता अवधि</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    @foreach ($panjikaran->nnswDetails->take(5) as $sn => $nnswDetail)
+                                                        <tr>
+                                                            <td>{{ ++$sn }}</td>
+                                                            <td>{{ $nnswDetail->nepal_rastriya_ekdwar_pranalima_anurodh_no ?? 'N/A' }}</td>
+                                                            <td>{{ $nnswDetail->nepal_rastriya_ekdwar_pranalima_anurodh_date ? $nnswDetail->nepal_rastriya_ekdwar_pranalima_anurodh_date->format('Y-m-d') : 'N/A' }}</td>
+                                                            <td>{{ $nnswDetail->company_code ?? 'N/A' }}</td>
+                                                            <td>{{ $nnswDetail->swikrit_no ?? 'N/A' }}</td>
+                                                            <td>{{ $nnswDetail->swikrit_date ? $nnswDetail->swikrit_date->format('Y-m-d') : 'N/A' }}</td>
+                                                            <td>{{ $nnswDetail->baidata_abadhi ?? 'N/A' }}</td>
+                                                        </tr>
+                                                    @endforeach
+                                                </tbody>
+                                            </table>
+                                            @if ($panjikaran->nnswDetails->count() > 5)
+                                                <p class="text-muted small">
+                                                    <i class="fa fa-info-circle"></i>
+                                                    कुल {{ $panjikaran->nnswDetails->count() }} NNSW विवरण मध्ये
+                                                    {{ min(5, $panjikaran->nnswDetails->count()) }} देखाइएको छ
+                                                </p>
+                                            @endif
+                                        </div>
+                                    @else
+                                        <div class="alert alert-info">
+                                            <i class="fa fa-info-circle"></i> कुनै NNSW विवरण डाटा उपलब्ध छैन
+                                        </div>
+                                    @endif
+                                </div>
+                            </div>
+
                             <!-- Foreign Producer Company -->
                             <div class="row mb-4">
                                 <div class="col-12">
@@ -295,75 +413,6 @@
                                 <div class="col-md-6 mb-3">
                                     <strong>इमेल:</strong>
                                     <p>{{ $panjikaran->Nepali_producer_company_email ?? 'N/A' }}</p>
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <strong>सम्पर्क:</strong>
-                                    <p>{{ $panjikaran->Nepali_producer_company_contact ?? 'N/A' }}</p>
-                                </div>
-                            </div>
-
-                            <!-- Samejasam Company -->
-                            <div class="row mb-4">
-                                <div class="col-12">
-                                    <h6 class="text-primary border-bottom pb-2">समेजसम कम्पनीको विवरण</h6>
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <strong>कम्पनीको नाम:</strong>
-                                    <p>{{ $panjikaran->Samejasamcompany_s_detail_name ?? 'N/A' }}</p>
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <strong>ठेगाना:</strong>
-                                    <p>{{ $panjikaran->Samejasamcompany_s_detail_address ?? 'N/A' }}</p>
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <strong>इमेल:</strong>
-                                    <p>{{ $panjikaran->Samejasamcompany_s_detail_email ?? 'N/A' }}</p>
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <strong>सम्पर्क:</strong>
-                                    <p>{{ $panjikaran->Samejasamcompany_s_detail_contact ?? 'N/A' }}</p>
-                                </div>
-                            </div>
-
-                            <!-- Packing Company -->
-                            <div class="row mb-4">
-                                <div class="col-12">
-                                    <h6 class="text-primary border-bottom pb-2">प्याकिङ कम्पनीको विवरण</h6>
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <strong>कम्पनीको नाम:</strong>
-                                    <p>{{ $panjikaran->Packing_company_details_name ?? 'N/A' }}</p>
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <strong>ठेगाना:</strong>
-                                    <p>{{ $panjikaran->Packing_company_details_address ?? 'N/A' }}</p>
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <strong>इमेल:</strong>
-                                    <p>{{ $panjikaran->Packing_company_details_email ?? 'N/A' }}</p>
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <strong>सम्पर्क:</strong>
-                                    <p>{{ $panjikaran->Packing_company_details_contact ?? 'N/A' }}</p>
-                                </div>
-                            </div>
-
-                            <!-- Paitharkarta Company -->
-                            <div class="row mb-4">
-                                <div class="col-12">
-                                    <h6 class="text-primary border-bottom pb-2">पैठारकर्ता कम्पनीको विवरण</h6>
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <strong>कम्पनीको नाम:</strong>
-                                    <p>{{ $panjikaran->Paitharkarta_company_details_name ?? 'N/A' }}</p>
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <strong>ठेगाना:</strong>
-                                    <p>{{ $panjikaran->Paitharkarta_company_details_address ?? 'N/A' }}</p>
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <strong>इमेल:</strong>
-                                    <p>{{ $panjikaran->Paitharkarta_company_details_email ?? 'N/A' }}</p>
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <strong>सम्पर्क:</strong>

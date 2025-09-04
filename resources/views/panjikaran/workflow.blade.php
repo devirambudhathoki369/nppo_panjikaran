@@ -18,21 +18,6 @@
     </div>
     <!-- end page title -->
 
-    <!-- Alert Messages -->
-    {{-- @if(session('success'))
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
-            {{ session('success') }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-    @endif
-
-    @if(session('error'))
-        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-            {{ session('error') }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-    @endif --}}
-
     <!-- Panjikaran Details -->
     <div class="row mb-3">
         <div class="col-12">
@@ -42,14 +27,11 @@
                     <div class="row">
                         <div class="col-md-4">
                             <p><strong>आवेदनकर्ता:</strong> {{ $panjikaran->checklist->ImporterName ?? 'N/A' }}</p>
-                            <p><strong>इजाजतपत्र नं.:</strong> {{ $panjikaran->checklist->LicenseNo ?? 'N/A' }}</p>
-                        </div>
-                        <div class="col-md-4">
-                            <p><strong>रासायनिक नाम:</strong> {{ $panjikaran->ChemicalName }}</p>
-                            <p><strong>स्रोत:</strong> {{ $panjikaran->source->sourcename ?? 'N/A' }}</p>
                         </div>
                         <div class="col-md-4">
                             <p><strong>उद्देश्य:</strong> {{ $panjikaran->objective->objective ?? 'N/A' }}</p>
+                        </div>
+                        <div class="col-md-4">
                             <p><strong>उपयोग:</strong> {{ $panjikaran->usage->usage_name ?? 'N/A' }}</p>
                         </div>
                     </div>
@@ -57,25 +39,36 @@
                     <!-- Common Names from Checklist -->
                     @if($panjikaran->checklist && $panjikaran->checklist->check_list_formulations->count() > 0)
                         <div class="mt-3">
-                            <h6><strong>सामान्य नामहरू:</strong></h6>
-                            <div class="row">
-                                @foreach($panjikaran->checklist->check_list_formulations as $formulation)
-                                    <div class="col-md-6 mb-2">
-                                        <div class="border p-2 rounded bg-light">
-                                            <div class="d-flex justify-content-between align-items-center">
-                                                <div>
-                                                    <strong>{{ $formulation->common_name->common_name ?? 'N/A' }}</strong>
-                                                    <br>
-                                                    <small class="text-muted">
-                                                        फॉर्मुलेशन: {{ $formulation->formulation->formulation_name ?? 'N/A' }}
-                                                        | मात्रा: {{ $formulation->ActiveIngredientValue ?? 'N/A' }} {{ $formulation->unit->unit_name ?? '' }}
-                                                    </small>
-                                                </div>
-                                                <span class="badge bg-primary">{{ $loop->iteration }}</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                @endforeach
+                            <h6><strong>सामान्य नामहरू र रासायनिक विवरण:</strong></h6>
+                            <div class="table-responsive">
+                                <table class="table table-bordered table-sm">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>सामान्य नाम</th>
+                                            <th>रासायनिक नाम</th>
+                                            <th>IUPAC नाम</th>
+                                            <th>CAS नम्बर</th>
+                                            <th>आणविक सूत्र</th>
+                                            <th>स्रोत</th>
+                                            <th>फॉर्मुलेशन</th>
+                                            <th>मात्रा</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach($panjikaran->checklist->check_list_formulations as $formulation)
+                                            <tr>
+                                                <td><strong>{{ $formulation->common_name->common_name ?? 'N/A' }}</strong></td>
+                                                <td>{{ $formulation->common_name->rasayanik_name ?? 'N/A' }}</td>
+                                                <td>{{ $formulation->common_name->iupac_name ?? 'N/A' }}</td>
+                                                <td>{{ $formulation->common_name->cas_no ?? 'N/A' }}</td>
+                                                <td>{{ $formulation->common_name->molecular_formula ?? 'N/A' }}</td>
+                                                <td>{{ $formulation->common_name->source->sourcename ?? 'N/A' }}</td>
+                                                <td>{{ $formulation->formulation->formulation_name ?? 'N/A' }}</td>
+                                                <td>{{ $formulation->ActiveIngredientValue ?? 'N/A' }} {{ $formulation->unit->unit_name ?? '' }}</td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
                             </div>
                         </div>
                     @endif
@@ -94,38 +87,60 @@
                         <div class="col-12">
                             <div class="progress-nav">
                                 <div class="progress">
-                                    <div class="progress-bar" role="progressbar" style="width: {{ $currentStep * 33.33 }}%"
-                                        aria-valuenow="{{ $currentStep * 33.33 }}" aria-valuemin="0" aria-valuemax="100">
+                                    <div class="progress-bar" role="progressbar" style="width: {{ $currentStep * 20 }}%"
+                                        aria-valuenow="{{ $currentStep * 20 }}" aria-valuemin="0" aria-valuemax="100">
                                     </div>
                                 </div>
                                 <div class="progress-nav-steps">
                                     <div class="step {{ $currentStep >= 1 ? 'active' : '' }}">
                                         <span class="step-number">1</span>
-                                        <span class="step-title">वर्गीकरण</span>
-                                        @if($bargikarans->count() > 0)
-                                            <small class="text-success mt-1">
-                                                <i class="fas fa-check-circle"></i> {{ $bargikarans->count() }} रेकर्ड
-                                            </small>
-                                        @endif
+                                        <span class="step-title">बिश्व स्वास्थ्य संगठनको वर्गीकरण</span>
                                     </div>
                                     <div class="step {{ $currentStep >= 2 ? 'active' : '' }}">
                                         <span class="step-number">2</span>
                                         <span class="step-title">सिफारिस बाली</span>
-                                        @if($recommendedCrops->count() > 0)
-                                            <small class="text-success mt-1">
-                                                <i class="fas fa-check-circle"></i> {{ $recommendedCrops->count() }} रेकर्ड
-                                            </small>
-                                        @endif
                                     </div>
                                     <div class="step {{ $currentStep >= 3 ? 'active' : '' }}">
                                         <span class="step-number">3</span>
                                         <span class="step-title">सिफारिस कीरा</span>
-                                        @if($recommendedPests->count() > 0)
-                                            <small class="text-success mt-1">
-                                                <i class="fas fa-check-circle"></i> {{ $recommendedPests->count() }} रेकर्ड
-                                            </small>
-                                        @endif
                                     </div>
+                                    <div class="step {{ $currentStep >= 4 ? 'active' : '' }}">
+                                        <span class="step-number">4</span>
+                                        <span class="step-title">H.C.S विवरण</span>
+                                    </div>
+                                    <div class="step {{ $currentStep >= 5 ? 'active' : '' }}">
+                                        <span class="step-number">5</span>
+                                        <span class="step-title">NNSW विवरण</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Navigation Buttons (Top) -->
+                    <div class="row mb-3">
+                        <div class="col-12">
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    @if ($currentStep > 1)
+                                        <a href="{{ route('panjikaran.workflow', ['panjikaran' => $panjikaran->id, 'step' => $currentStep - 1]) }}"
+                                            class="btn btn-secondary">
+                                            <i class="fa fa-arrow-left"></i> अघिल्लो चरण
+                                        </a>
+                                    @endif
+                                </div>
+                                <div>
+                                    @if ($currentStep < 5)
+                                        <a href="{{ route('panjikaran.workflow', ['panjikaran' => $panjikaran->id, 'step' => $currentStep + 1]) }}"
+                                            class="btn btn-primary">
+                                            अर्को चरण <i class="fa fa-arrow-right"></i>
+                                        </a>
+                                    @else
+                                        <a href="{{ route('panjikarans.show', $panjikaran->id) }}"
+                                            class="btn btn-success">
+                                            <i class="fa fa-check"></i> पूरा भयो
+                                        </a>
+                                    @endif
                                 </div>
                             </div>
                         </div>
@@ -136,18 +151,13 @@
                         @if ($currentStep == 1)
                             <!-- Bargikaran Tab -->
                             <div class="tab-pane fade show active">
-                                <h5 class="mb-3">
-                                    <i class="fas fa-layer-group text-primary"></i> वर्गीकरण व्यवस्थापन
-                                </h5>
+                                <h5 class="mb-3">बिश्व स्वास्थ्य संगठनको वर्गीकरण व्यवस्थापन</h5>
 
                                 <!-- Add New Bargikaran Form -->
-                                <div class="card mb-4 border-primary">
-                                    <div class="card-header bg-primary text-white">
-                                        <h6 class="card-title mb-0">
-                                            <i class="fas fa-plus-circle"></i> नयाँ वर्गीकरण थप्नुहोस्
-                                        </h6>
-                                    </div>
+                                <div class="card mb-4">
                                     <div class="card-body">
+                                        <h6 class="card-title">नयाँ वर्गीकरण थप्नुहोस्</h6>
+
                                         @if ($errors->any())
                                             <div class="alert alert-danger">
                                                 <ul class="mb-0">
@@ -165,22 +175,25 @@
 
                                             <div class="row">
                                                 <div class="col-md-4">
-                                                    <div class="form-floating mb-3">
+                                                    <div class="mb-3">
+                                                        <label for="code" class="form-label">कोड <span
+                                                                class="text-danger">*</span></label>
                                                         <input type="number" class="form-control" id="code"
-                                                            name="code" value="{{ old('code') }}" required placeholder="कोड">
-                                                        <label for="code">कोड <span class="text-danger">*</span></label>
+                                                            name="code" value="{{ old('code') }}" required>
                                                     </div>
                                                 </div>
                                                 <div class="col-md-6">
-                                                    <div class="form-floating mb-3">
+                                                    <div class="mb-3">
+                                                        <label for="make" class="form-label">बनावट <span
+                                                                class="text-danger">*</span></label>
                                                         <input type="text" class="form-control" id="make"
-                                                            name="make" value="{{ old('make') }}" required placeholder="बनावट">
-                                                        <label for="make">बनावट <span class="text-danger">*</span></label>
+                                                            name="make" value="{{ old('make') }}" required>
                                                     </div>
                                                 </div>
                                                 <div class="col-md-2">
                                                     <div class="mb-3">
-                                                        <button type="submit" class="btn btn-primary w-100" style="height: 58px;">
+                                                        <label class="form-label">&nbsp;</label>
+                                                        <button type="submit" class="btn btn-primary w-100">
                                                             <i class="fa fa-plus"></i> थप्नुहोस्
                                                         </button>
                                                     </div>
@@ -191,82 +204,60 @@
                                 </div>
 
                                 <!-- Bargikaran List -->
-                                <div class="card">
-                                    <div class="card-header">
-                                        <h6 class="card-title mb-0">
-                                            <i class="fas fa-list"></i> वर्गीकरण सूची
-                                            <span class="badge bg-info ms-2">{{ $bargikarans->count() }} रेकर्ड</span>
-                                        </h6>
-                                    </div>
-                                    <div class="card-body">
-                                        <div class="table-responsive">
-                                            <table class="table table-hover table-bordered">
-                                                <thead class="table-primary">
-                                                    <tr>
-                                                        <th style="width: 10%;">S.N.</th>
-                                                        <th style="width: 20%;">कोड</th>
-                                                        <th style="width: 40%;">बनावट</th>
-                                                        <th style="width: 20%;">मिति</th>
-                                                        <th style="width: 10%;">कार्य</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    @forelse ($bargikarans as $sn => $bargikaran)
-                                                        <tr>
-                                                            <td>{{ ++$sn }}</td>
-                                                            <td><strong>{{ $bargikaran->code }}</strong></td>
-                                                            <td>{{ $bargikaran->make }}</td>
-                                                            <td>{{ $bargikaran->created_at->format('Y-m-d') }}</td>
-                                                            <td>
-                                                                <div class="btn-group" role="group">
-                                                                    <a href="{{ route('bargikarans.edit', $bargikaran->id) }}"
-                                                                        class="btn btn-success btn-sm" title="सम्पादन गर्नुहोस्">
-                                                                        <i class="bx bx-edit"></i>
-                                                                    </a>
-                                                                    <form action="{{ route('bargikarans.destroy', $bargikaran) }}"
-                                                                          method="POST" style="display: inline;"
-                                                                          onsubmit="return confirm('तपाईं यो डाटा मेटाउन निश्चित हुनुहुन्छ?')">
-                                                                        @csrf
-                                                                        @method('DELETE')
-                                                                        <input type="hidden" name="from_workflow" value="1">
-                                                                        <button type="submit" class="btn btn-danger btn-sm" title="मेटाउनुहोस्">
-                                                                            <i class="fa fa-trash"></i>
-                                                                        </button>
-                                                                    </form>
-                                                                </div>
-                                                            </td>
-                                                        </tr>
-                                                    @empty
-                                                        <tr>
-                                                            <td colspan="5" class="text-center py-4">
-                                                                <div class="text-muted">
-                                                                    <i class="fas fa-inbox fa-2x mb-2"></i>
-                                                                    <p>कुनै वर्गीकरण डाटा उपलब्ध छैन</p>
-                                                                </div>
-                                                            </td>
-                                                        </tr>
-                                                    @endforelse
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    </div>
+                                <div class="table-responsive">
+                                    <table class="table table-bordered">
+                                        <thead>
+                                            <tr>
+                                                <th>S.N.</th>
+                                                <th>कोड</th>
+                                                <th>बनावट</th>
+                                                <th>मिति</th>
+                                                <th>कार्य</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @forelse ($bargikarans as $sn => $bargikaran)
+                                                <tr>
+                                                    <td>{{ ++$sn }}</td>
+                                                    <td>{{ $bargikaran->code }}</td>
+                                                    <td>{{ $bargikaran->make }}</td>
+                                                    <td>{{ $bargikaran->created_at->format('Y-m-d') }}</td>
+                                                    <td>
+                                                        <a href="{{ route('bargikarans.edit', $bargikaran->id) }}"
+                                                            class="btn btn-success btn-xs">
+                                                            <i class="bx bx-edit"></i>
+                                                        </a>
+                                                        <form action="{{ route('bargikarans.destroy', $bargikaran) }}"
+                                                              method="POST" style="display: inline;"
+                                                              onsubmit="return confirm('तपाईं यो डाटा मेटाउन निश्चित हुनुहुन्छ?')">
+                                                            @csrf
+                                                            @method('DELETE')
+                                                            <input type="hidden" name="from_workflow" value="1">
+                                                            <button type="submit" class="btn btn-danger btn-xs">
+                                                                <i class="fa fa-trash"></i>
+                                                            </button>
+                                                        </form>
+                                                    </td>
+                                                </tr>
+                                            @empty
+                                                <tr>
+                                                    <td colspan="5" class="text-center">कुनै डाटा उपलब्ध छैन</td>
+                                                </tr>
+                                            @endforelse
+                                        </tbody>
+                                    </table>
                                 </div>
                             </div>
                         @elseif($currentStep == 2)
                             <!-- Recommended Crops Tab -->
                             <div class="tab-pane fade show active">
-                                <h5 class="mb-3">
-                                    <i class="fas fa-seedling text-success"></i> सिफारिस गरिएको बाली व्यवस्थापन
-                                </h5>
+                                <h5 class="mb-3">सिफारिस गरिएको बाली व्यवस्थापन</h5>
 
                                 <!-- Add New Recommended Crop Form -->
-                                <div class="card mb-4 border-success">
-                                    <div class="card-header bg-success text-white">
-                                        <h6 class="card-title mb-0">
-                                            <i class="fas fa-plus-circle"></i> नयाँ बाली सिफारिस थप्नुहोस्
-                                        </h6>
-                                    </div>
+                                <div class="card mb-4">
                                     <div class="card-body">
+                                        <h6 class="card-title">नयाँ बाली सिफारिस थप्नुहोस्</h6>
+
                                         <form action="{{ route('recommended-crops.store') }}" method="POST">
                                             @csrf
                                             <input type="hidden" name="from_workflow" value="1">
@@ -274,21 +265,23 @@
 
                                             <div class="row">
                                                 <div class="col-md-8">
-                                                    <div class="form-floating mb-3">
-                                                        <select class="form-select" id="crop_id" name="crop_id" required>
+                                                    <div class="mb-3">
+                                                        <label for="crop_id" class="form-label">बाली <span
+                                                                class="text-danger">*</span></label>
+                                                        <select class="form-select" id="crop_id" name="crop_id"
+                                                            required>
                                                             <option value="">बाली छान्नुहोस्</option>
                                                             @foreach ($crops as $crop)
-                                                                <option value="{{ $crop->id }}" {{ old('crop_id') == $crop->id ? 'selected' : '' }}>
-                                                                    {{ $crop->crop_name }}
-                                                                </option>
+                                                                <option value="{{ $crop->id }}">
+                                                                    {{ $crop->crop_name }}</option>
                                                             @endforeach
                                                         </select>
-                                                        <label for="crop_id">बाली <span class="text-danger">*</span></label>
                                                     </div>
                                                 </div>
                                                 <div class="col-md-4">
                                                     <div class="mb-3">
-                                                        <button type="submit" class="btn btn-success w-100" style="height: 58px;">
+                                                        <label class="form-label">&nbsp;</label>
+                                                        <button type="submit" class="btn btn-primary w-100">
                                                             <i class="fa fa-plus"></i> थप्नुहोस्
                                                         </button>
                                                     </div>
@@ -299,82 +292,59 @@
                                 </div>
 
                                 <!-- Recommended Crops List -->
-                                <div class="card">
-                                    <div class="card-header">
-                                        <h6 class="card-title mb-0">
-                                            <i class="fas fa-list"></i> सिफारिस गरिएको बाली सूची
-                                            <span class="badge bg-info ms-2">{{ $recommendedCrops->count() }} रेकर्ड</span>
-                                        </h6>
-                                    </div>
-                                    <div class="card-body">
-                                        <div class="table-responsive">
-                                            <table class="table table-hover table-bordered">
-                                                <thead class="table-success">
-                                                    <tr>
-                                                        <th style="width: 10%;">S.N.</th>
-                                                        <th style="width: 50%;">बालीको नाम</th>
-                                                        <th style="width: 25%;">मिति</th>
-                                                        <th style="width: 15%;">कार्य</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    @forelse ($recommendedCrops as $sn => $recommendedCrop)
-                                                        <tr>
-                                                            <td>{{ ++$sn }}</td>
-                                                            <td>
-                                                                <strong>{{ $recommendedCrop->crop->crop_name ?? 'N/A' }}</strong>
-                                                            </td>
-                                                            <td>{{ $recommendedCrop->created_at->format('Y-m-d') }}</td>
-                                                            <td>
-                                                                <div class="btn-group" role="group">
-                                                                    <a href="{{ route('recommended-crops.edit', $recommendedCrop->id) }}"
-                                                                        class="btn btn-success btn-sm" title="सम्पादन गर्नुहोस्">
-                                                                        <i class="bx bx-edit"></i>
-                                                                    </a>
-                                                                    <form action="{{ route('recommended-crops.destroy', $recommendedCrop->id) }}"
-                                                                          method="POST" style="display: inline;"
-                                                                          onsubmit="return confirm('तपाईं यो डाटा मेटाउन निश्चित हुनुहुन्छ?')">
-                                                                        @csrf
-                                                                        @method('DELETE')
-                                                                        <input type="hidden" name="from_workflow" value="1">
-                                                                        <button type="submit" class="btn btn-danger btn-sm" title="मेटाउनुहोस्">
-                                                                            <i class="fa fa-trash"></i>
-                                                                        </button>
-                                                                    </form>
-                                                                </div>
-                                                            </td>
-                                                        </tr>
-                                                    @empty
-                                                        <tr>
-                                                            <td colspan="4" class="text-center py-4">
-                                                                <div class="text-muted">
-                                                                    <i class="fas fa-seedling fa-2x mb-2"></i>
-                                                                    <p>कुनै बाली सिफारिस डाटा उपलब्ध छैन</p>
-                                                                </div>
-                                                            </td>
-                                                        </tr>
-                                                    @endforelse
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    </div>
+                                <div class="table-responsive">
+                                    <table class="table table-bordered">
+                                        <thead>
+                                            <tr>
+                                                <th>S.N.</th>
+                                                <th>बालीको नाम</th>
+                                                <th>मिति</th>
+                                                <th>कार्य</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @forelse ($recommendedCrops as $sn => $recommendedCrop)
+                                                <tr>
+                                                    <td>{{ ++$sn }}</td>
+                                                    <td>{{ $recommendedCrop->crop->crop_name ?? 'N/A' }}</td>
+                                                    <td>{{ $recommendedCrop->created_at->format('Y-m-d') }}</td>
+                                                    <td>
+                                                        <a href="{{ route('recommended-crops.edit', $recommendedCrop->id) }}"
+                                                            class="btn btn-success btn-xs">
+                                                            <i class="bx bx-edit"></i>
+                                                        </a>
+                                                        <form
+                                                            action="{{ route('recommended-crops.destroy', $recommendedCrop->id) }}"
+                                                            method="POST" style="display: inline-block;"
+                                                            onsubmit="return confirm('तपाईं यो डाटा मेटाउन निश्चित हुनुहुन्छ?')">
+                                                            @csrf
+                                                            @method('DELETE')
+                                                            <input type="hidden" name="from_workflow" value="1">
+                                                            <button type="submit" class="btn btn-xs btn-danger">
+                                                                <i class="fa fa-trash"></i>
+                                                            </button>
+                                                        </form>
+                                                    </td>
+                                                </tr>
+                                            @empty
+                                                <tr>
+                                                    <td colspan="4" class="text-center">कुनै डाटा उपलब्ध छैन</td>
+                                                </tr>
+                                            @endforelse
+                                        </tbody>
+                                    </table>
                                 </div>
                             </div>
-                        @else
-                            <!-- Recommended Pests Tab (Step 3) -->
+                        @elseif($currentStep == 3)
+                            <!-- Recommended Pests Tab -->
                             <div class="tab-pane fade show active">
-                                <h5 class="mb-3">
-                                    <i class="fas fa-bug text-warning"></i> सिफारिस गरिएको कीरा व्यवस्थापन
-                                </h5>
+                                <h5 class="mb-3">सिफारिस गरिएको कीरा व्यवस्थापन</h5>
 
                                 <!-- Add New Recommended Pest Form -->
-                                <div class="card mb-4 border-warning">
-                                    <div class="card-header bg-warning text-dark">
-                                        <h6 class="card-title mb-0">
-                                            <i class="fas fa-plus-circle"></i> नयाँ कीरा सिफारिस थप्नुहोस्
-                                        </h6>
-                                    </div>
+                                <div class="card mb-4">
                                     <div class="card-body">
+                                        <h6 class="card-title">नयाँ कीरा सिफारिस थप्नुहोस्</h6>
+
                                         <form action="{{ route('recommended-pests.store') }}" method="POST">
                                             @csrf
                                             <input type="hidden" name="from_workflow" value="1">
@@ -382,21 +352,23 @@
 
                                             <div class="row">
                                                 <div class="col-md-8">
-                                                    <div class="form-floating mb-3">
-                                                        <select class="form-select" id="pest_id" name="pest_id" required>
+                                                    <div class="mb-3">
+                                                        <label for="pest_id" class="form-label">कीरा <span
+                                                                class="text-danger">*</span></label>
+                                                        <select class="form-select" id="pest_id" name="pest_id"
+                                                            required>
                                                             <option value="">कीरा छान्नुहोस्</option>
                                                             @foreach ($pests as $pest)
-                                                                <option value="{{ $pest->id }}" {{ old('pest_id') == $pest->id ? 'selected' : '' }}>
-                                                                    {{ $pest->pest }}
+                                                                <option value="{{ $pest->id }}">{{ $pest->pest }}
                                                                 </option>
                                                             @endforeach
                                                         </select>
-                                                        <label for="pest_id">कीरा <span class="text-danger">*</span></label>
                                                     </div>
                                                 </div>
                                                 <div class="col-md-4">
                                                     <div class="mb-3">
-                                                        <button type="submit" class="btn btn-warning w-100" style="height: 58px;">
+                                                        <label class="form-label">&nbsp;</label>
+                                                        <button type="submit" class="btn btn-primary w-100">
                                                             <i class="fa fa-plus"></i> थप्नुहोस्
                                                         </button>
                                                     </div>
@@ -407,131 +379,315 @@
                                 </div>
 
                                 <!-- Recommended Pests List -->
-                                <div class="card">
-                                    <div class="card-header">
-                                        <h6 class="card-title mb-0">
-                                            <i class="fas fa-list"></i> सिफारिस गरिएको कीरा सूची
-                                            <span class="badge bg-info ms-2">{{ $recommendedPests->count() }} रेकर्ड</span>
-                                        </h6>
-                                    </div>
+                                <div class="table-responsive">
+                                    <table class="table table-bordered">
+                                        <thead>
+                                            <tr>
+                                                <th>S.N.</th>
+                                                <th>कीराको नाम</th>
+                                                <th>मिति</th>
+                                                <th>कार्य</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @forelse ($recommendedPests as $sn => $recommendedPest)
+                                                <tr>
+                                                    <td>{{ ++$sn }}</td>
+                                                    <td>{{ $recommendedPest->pest->pest ?? 'N/A' }}</td>
+                                                    <td>{{ $recommendedPest->created_at->format('Y-m-d') }}</td>
+                                                    <td>
+                                                        <a href="{{ route('recommended-pests.edit', $recommendedPest->id) }}"
+                                                            class="btn btn-success btn-xs">
+                                                            <i class="bx bx-edit"></i>
+                                                        </a>
+                                                        <form
+                                                            action="{{ route('recommended-pests.destroy', $recommendedPest->id) }}"
+                                                            method="POST" style="display: inline-block;"
+                                                            onsubmit="return confirm('तपाईं यो डाटा मेटाउन निश्चित हुनुहुन्छ?')">
+                                                            @csrf
+                                                            @method('DELETE')
+                                                            <input type="hidden" name="from_workflow" value="1">
+                                                            <button type="submit" class="btn btn-xs btn-danger">
+                                                                <i class="fa fa-trash"></i>
+                                                            </button>
+                                                        </form>
+                                                    </td>
+                                                </tr>
+                                            @empty
+                                                <tr>
+                                                    <td colspan="4" class="text-center">कुनै डाटा उपलब्ध छैन</td>
+                                                </tr>
+                                            @endforelse
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        @elseif($currentStep == 4)
+                            <!-- HCS Details Tab -->
+                            <div class="tab-pane fade show active">
+                                <h5 class="mb-3">H.C.S विवरण व्यवस्थापन</h5>
+
+                                <!-- Add New HCS Detail Form -->
+                                <div class="card mb-4">
                                     <div class="card-body">
-                                        <div class="table-responsive">
-                                            <table class="table table-hover table-bordered">
-                                                <thead class="table-warning">
-                                                    <tr>
-                                                        <th style="width: 10%;">S.N.</th>
-                                                        <th style="width: 50%;">कीराको नाम</th>
-                                                        <th style="width: 25%;">मिति</th>
-                                                        <th style="width: 15%;">कार्य</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    @forelse ($recommendedPests as $sn => $recommendedPest)
-                                                        <tr>
-                                                            <td>{{ ++$sn }}</td>
-                                                            <td>
-                                                                <strong>{{ $recommendedPest->pest->pest ?? 'N/A' }}</strong>
-                                                            </td>
-                                                            <td>{{ $recommendedPest->created_at->format('Y-m-d') }}</td>
-                                                            <td>
-                                                                <div class="btn-group" role="group">
-                                                                    <a href="{{ route('recommended-pests.edit', $recommendedPest->id) }}"
-                                                                        class="btn btn-success btn-sm" title="सम्पादन गर्नुहोस्">
-                                                                        <i class="bx bx-edit"></i>
-                                                                    </a>
-                                                                    <form action="{{ route('recommended-pests.destroy', $recommendedPest->id) }}"
-                                                                          method="POST" style="display: inline;"
-                                                                          onsubmit="return confirm('तपाईं यो डाटा मेटाउन निश्चित हुनुहुन्छ?')">
-                                                                        @csrf
-                                                                        @method('DELETE')
-                                                                        <input type="hidden" name="from_workflow" value="1">
-                                                                        <button type="submit" class="btn btn-danger btn-sm" title="मेटाउनुहोस्">
-                                                                            <i class="fa fa-trash"></i>
-                                                                        </button>
-                                                                    </form>
-                                                                </div>
-                                                            </td>
-                                                        </tr>
-                                                    @empty
-                                                        <tr>
-                                                            <td colspan="4" class="text-center py-4">
-                                                                <div class="text-muted">
-                                                                    <i class="fas fa-bug fa-2x mb-2"></i>
-                                                                    <p>कुनै कीरा सिफारिस डाटा उपलब्ध छैन</p>
-                                                                </div>
-                                                            </td>
-                                                        </tr>
-                                                    @endforelse
-                                                </tbody>
-                                            </table>
-                                        </div>
+                                        <h6 class="card-title">नयाँ H.C.S विवरण थप्नुहोस्</h6>
+
+                                        <form action="{{ route('hcs-details.store') }}" method="POST">
+                                            @csrf
+                                            <input type="hidden" name="from_workflow" value="1">
+                                            <input type="hidden" name="checklist_id" value="{{ $panjikaran->checklist->id }}">
+                                            <input type="hidden" name="panjikaran_id" value="{{ $panjikaran->id }}">
+
+                                            <div class="row">
+                                                <div class="col-md-3">
+                                                    <div class="mb-3">
+                                                        <label for="self_life_of_the_product" class="form-label">उत्पादनको शेल्फ लाइफ</label>
+                                                        <input type="text" class="form-control" id="self_life_of_the_product"
+                                                            name="self_life_of_the_product" value="{{ old('self_life_of_the_product') }}">
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <div class="mb-3">
+                                                        <label for="date" class="form-label">मिति</label>
+                                                        <input type="date" class="form-control" id="date"
+                                                            name="date" value="{{ old('date') }}">
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <div class="mb-3">
+                                                        <label for="hcs_code" class="form-label">H.C.S कोड <span class="text-danger">*</span></label>
+                                                        <input type="text" class="form-control @error('hcs_code') is-invalid @enderror"
+                                                            id="hcs_code" name="hcs_code" value="{{ old('hcs_code') }}" required>
+                                                        @error('hcs_code')
+                                                        <span class="invalid-feedback" role="alert">
+                                                            <strong>{{ $message }}</strong>
+                                                        </span>
+                                                        @enderror
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <div class="mb-3">
+                                                        <label class="form-label">&nbsp;</label>
+                                                        <button type="submit" class="btn btn-primary w-100">
+                                                            <i class="fa fa-plus"></i> थप्नुहोस्
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-md-12">
+                                                    <div class="mb-3">
+                                                        <label for="tax_payment_bhauchar_details" class="form-label">कर भुक्तानी भौचर विवरण</label>
+                                                        <textarea class="form-control" id="tax_payment_bhauchar_details"
+                                                            name="tax_payment_bhauchar_details" rows="3">{{ old('tax_payment_bhauchar_details') }}</textarea>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </form>
                                     </div>
+                                </div>
+
+                                <!-- HCS Details List -->
+                                <div class="table-responsive">
+                                    <table class="table table-bordered">
+                                        <thead>
+                                            <tr>
+                                                <th>S.N.</th>
+                                                <th>H.C.S कोड</th>
+                                                <th>शेल्फ लाइफ</th>
+                                                <th>कर भुक्तानी विवरण</th>
+                                                <th>मिति</th>
+                                                <th>कार्य</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @forelse ($hcsDetails as $sn => $hcsDetail)
+                                                <tr>
+                                                    <td>{{ ++$sn }}</td>
+                                                    <td>{{ $hcsDetail->hcs_code }}</td>
+                                                    <td>{{ $hcsDetail->self_life_of_the_product ?? 'N/A' }}</td>
+                                                    <td>{{ Str::limit($hcsDetail->tax_payment_bhauchar_details, 50) ?? 'N/A' }}</td>
+                                                    <td>{{ $hcsDetail->date ? $hcsDetail->date->format('Y-m-d') : 'N/A' }}</td>
+                                                    <td>
+                                                        <a href="{{ route('hcs-details.edit', $hcsDetail->id) }}"
+                                                            class="btn btn-success btn-xs">
+                                                            <i class="bx bx-edit"></i>
+                                                        </a>
+                                                        <form action="{{ route('hcs-details.destroy', $hcsDetail->id) }}"
+                                                            method="POST" style="display: inline-block;"
+                                                            onsubmit="return confirm('तपाईं यो डाटा मेटाउन निश्चित हुनुहुन्छ?')">
+                                                            @csrf
+                                                            @method('DELETE')
+                                                            <input type="hidden" name="from_workflow" value="1">
+                                                            <button type="submit" class="btn btn-xs btn-danger">
+                                                                <i class="fa fa-trash"></i>
+                                                            </button>
+                                                        </form>
+                                                    </td>
+                                                </tr>
+                                            @empty
+                                                <tr>
+                                                    <td colspan="6" class="text-center">कुनै डाटा उपलब्ध छैन</td>
+                                                </tr>
+                                            @endforelse
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        @else
+                            <!-- NNSW Details Tab (Step 5) -->
+                            <div class="tab-pane fade show active">
+                                <h5 class="mb-3">NNSW विवरण व्यवस्थापन</h5>
+
+                                <!-- Add New NNSW Detail Form -->
+                                <div class="card mb-4">
+                                    <div class="card-body">
+                                        <h6 class="card-title">नयाँ NNSW विवरण थप्नुहोस्</h6>
+
+                                        <form action="{{ route('nnsw-details.store') }}" method="POST">
+                                            @csrf
+                                            <input type="hidden" name="from_workflow" value="1">
+                                            <input type="hidden" name="checklist_id" value="{{ $panjikaran->checklist->id }}">
+                                            <input type="hidden" name="panjikaran_id" value="{{ $panjikaran->id }}">
+
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <div class="mb-3">
+                                                        <label for="nepal_rastriya_ekdwar_pranalima_anurodh_no" class="form-label">नेपाल राष्ट्रिय एकद्वार प्रणालीमा अनुरोध नं.</label>
+                                                        <input type="text" class="form-control" id="nepal_rastriya_ekdwar_pranalima_anurodh_no"
+                                                            name="nepal_rastriya_ekdwar_pranalima_anurodh_no" value="{{ old('nepal_rastriya_ekdwar_pranalima_anurodh_no') }}">
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="mb-3">
+                                                        <label for="nepal_rastriya_ekdwar_pranalima_anurodh_date" class="form-label">नेपाल राष्ट्रिय एकद्वार प्रणालीमा अनुरोध मिति</label>
+                                                        <input type="date" class="form-control" id="nepal_rastriya_ekdwar_pranalima_anurodh_date"
+                                                            name="nepal_rastriya_ekdwar_pranalima_anurodh_date" value="{{ old('nepal_rastriya_ekdwar_pranalima_anurodh_date') }}">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-md-4">
+                                                    <div class="mb-3">
+                                                        <label for="company_code" class="form-label">कम्पनी कोड</label>
+                                                        <input type="text" class="form-control" id="company_code"
+                                                            name="company_code" value="{{ old('company_code') }}">
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <div class="mb-3">
+                                                        <label for="swikrit_no" class="form-label">स्वीकृति नं.</label>
+                                                        <input type="text" class="form-control" id="swikrit_no"
+                                                            name="swikrit_no" value="{{ old('swikrit_no') }}">
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <div class="mb-3">
+                                                        <label for="swikrit_date" class="form-label">स्वीकृति मिति</label>
+                                                        <input type="date" class="form-control" id="swikrit_date"
+                                                            name="swikrit_date" value="{{ old('swikrit_date') }}">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-md-8">
+                                                    <div class="mb-3">
+                                                        <label for="baidata_abadhi" class="form-label">वैधता अवधि</label>
+                                                        <input type="text" class="form-control" id="baidata_abadhi"
+                                                            name="baidata_abadhi" value="{{ old('baidata_abadhi') }}">
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <div class="mb-3">
+                                                        <label class="form-label">&nbsp;</label>
+                                                        <button type="submit" class="btn btn-primary w-100">
+                                                            <i class="fa fa-plus"></i> थप्नुहोस्
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+
+                                <!-- NNSW Details List -->
+                                <div class="table-responsive">
+                                    <table class="table table-bordered">
+                                        <thead>
+                                            <tr>
+                                                <th>S.N.</th>
+                                                <th>अनुरोध नं.</th>
+                                                <th>अनुरोध मिति</th>
+                                                <th>कम्पनी कोड</th>
+                                                <th>स्वीकृति नं.</th>
+                                                <th>स्वीकृति मिति</th>
+                                                <th>वैधता अवधि</th>
+                                                <th>कार्य</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @forelse ($nnswDetails as $sn => $nnswDetail)
+                                                <tr>
+                                                    <td>{{ ++$sn }}</td>
+                                                    <td>{{ $nnswDetail->nepal_rastriya_ekdwar_pranalima_anurodh_no ?? 'N/A' }}</td>
+                                                    <td>{{ $nnswDetail->nepal_rastriya_ekdwar_pranalima_anurodh_date ? $nnswDetail->nepal_rastriya_ekdwar_pranalima_anurodh_date->format('Y-m-d') : 'N/A' }}</td>
+                                                    <td>{{ $nnswDetail->company_code ?? 'N/A' }}</td>
+                                                    <td>{{ $nnswDetail->swikrit_no ?? 'N/A' }}</td>
+                                                    <td>{{ $nnswDetail->swikrit_date ? $nnswDetail->swikrit_date->format('Y-m-d') : 'N/A' }}</td>
+                                                    <td>{{ $nnswDetail->baidata_abadhi ?? 'N/A' }}</td>
+                                                    <td>
+                                                        <a href="{{ route('nnsw-details.edit', $nnswDetail->id) }}"
+                                                            class="btn btn-success btn-xs">
+                                                            <i class="bx bx-edit"></i>
+                                                        </a>
+                                                        <form action="{{ route('nnsw-details.destroy', $nnswDetail->id) }}"
+                                                            method="POST" style="display: inline-block;"
+                                                            onsubmit="return confirm('तपाईं यो डाटा मेटाउन निश्चित हुनुहुन्छ?')">
+                                                            @csrf
+                                                            @method('DELETE')
+                                                            <input type="hidden" name="from_workflow" value="1">
+                                                            <button type="submit" class="btn btn-xs btn-danger">
+                                                                <i class="fa fa-trash"></i>
+                                                            </button>
+                                                        </form>
+                                                    </td>
+                                                </tr>
+                                            @empty
+                                                <tr>
+                                                    <td colspan="8" class="text-center">कुनै डाटा उपलब्ध छैन</td>
+                                                </tr>
+                                            @endforelse
+                                        </tbody>
+                                    </table>
                                 </div>
                             </div>
                         @endif
                     </div>
 
-                    <!-- Navigation Buttons -->
+                    <!-- Navigation Buttons (Bottom) -->
                     <div class="row mt-4">
                         <div class="col-12">
                             <div class="d-flex justify-content-between">
                                 <div>
                                     @if ($currentStep > 1)
                                         <a href="{{ route('panjikaran.workflow', ['panjikaran' => $panjikaran->id, 'step' => $currentStep - 1]) }}"
-                                            class="btn btn-outline-secondary btn-lg">
+                                            class="btn btn-secondary">
                                             <i class="fa fa-arrow-left"></i> अघिल्लो चरण
-                                        </a>
-                                    @else
-                                        <a href="{{ route('panjikarans.index') }}" class="btn btn-outline-secondary btn-lg">
-                                            <i class="fa fa-list"></i> पञ्जीकरण सूची
                                         </a>
                                     @endif
                                 </div>
                                 <div>
-                                    @if ($currentStep < 3)
+                                    @if ($currentStep < 5)
                                         <a href="{{ route('panjikaran.workflow', ['panjikaran' => $panjikaran->id, 'step' => $currentStep + 1]) }}"
-                                            class="btn btn-primary btn-lg">
+                                            class="btn btn-primary">
                                             अर्को चरण <i class="fa fa-arrow-right"></i>
                                         </a>
                                     @else
                                         <a href="{{ route('panjikarans.show', $panjikaran->id) }}"
-                                            class="btn btn-success btn-lg">
-                                            <i class="fa fa-check-circle"></i> पूरा भयो
+                                            class="btn btn-success">
+                                            <i class="fa fa-check"></i> पूरा भयो
                                         </a>
                                     @endif
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Workflow Summary Card -->
-                    <div class="row mt-4">
-                        <div class="col-12">
-                            <div class="card bg-light">
-                                <div class="card-body">
-                                    <h6 class="card-title">
-                                        <i class="fas fa-chart-pie"></i> कार्यप्रवाह सारांश
-                                    </h6>
-                                    <div class="row text-center">
-                                        <div class="col-md-4">
-                                            <div class="p-2">
-                                                <h4 class="text-primary">{{ $bargikarans->count() }}</h4>
-                                                <small class="text-muted">वर्गीकरण रेकर्ड</small>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-4">
-                                            <div class="p-2">
-                                                <h4 class="text-success">{{ $recommendedCrops->count() }}</h4>
-                                                <small class="text-muted">सिफारिस बाली</small>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-4">
-                                            <div class="p-2">
-                                                <h4 class="text-warning">{{ $recommendedPests->count() }}</h4>
-                                                <small class="text-muted">सिफारिस कीरा</small>
-                                            </div>
-                                        </div>
-                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -548,109 +704,50 @@
         }
 
         .progress {
-            height: 6px;
+            height: 4px;
             background-color: #e9ecef;
-            border-radius: 3px;
-        }
-
-        .progress-bar {
-            transition: width 0.6s ease;
         }
 
         .progress-nav-steps {
             display: flex;
             justify-content: space-between;
-            margin-top: -3px;
+            margin-top: -2px;
+        }
+
+        .step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+        }
+
+        .step-number {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background-color: #6c757d;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+            margin-bottom: 4px;
         }
 
         .step.active .step-number {
             background-color: #007bff;
-            box-shadow: 0 0 0 4px rgba(0, 123, 255, 0.25);
         }
 
         .step-title {
-            font-size: 13px;
-            font-weight: 600;
+            font-size: 12px;
+            font-weight: 500;
             color: #6c757d;
             text-align: center;
-            margin-bottom: 4px;
         }
 
         .step.active .step-title {
             color: #007bff;
-        }
-
-        .step small {
-            font-size: 11px;
-            display: block;
-        }
-
-        .card {
-            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
-            transition: box-shadow 0.15s ease-in-out;
-        }
-
-        .card:hover {
-            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
-        }
-
-        .table-hover tbody tr:hover {
-            background-color: rgba(0, 123, 255, 0.075);
-        }
-
-        .btn-group .btn {
-            margin-right: 2px;
-        }
-
-        .btn-group .btn:last-child {
-            margin-right: 0;
-        }
-
-        .alert {
-            border: none;
-            border-radius: 8px;
-        }
-
-        .badge {
-            font-size: 0.7em;
-        }
-
-        @media (max-width: 768px) {
-            .progress-nav-steps {
-                flex-direction: column;
-                gap: 20px;
-            }
-
-            .step {
-                flex-direction: row;
-                justify-content: center;
-                gap: 10px;
-            }
-
-            .step-number {
-                margin-bottom: 0;
-            }
-        }
-
-        .form-floating > label {
-            font-weight: 500;
-        }
-
-        .table thead th {
-            border-top: none;
-            font-weight: 600;
-            font-size: 0.9em;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .card-header h6 {
-            font-weight: 600;
-        }
-
-        .workflow-summary {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
         }
     </style>
 @endsection

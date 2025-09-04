@@ -14,9 +14,17 @@ return new class extends Migration
         Schema::create('common_names', function (Blueprint $table) {
             $table->id();
             $table->string('common_name');
+            $table->string('rasayanik_name')->nullable();
+            $table->string('iupac_name')->nullable();
+            $table->string('cas_no')->nullable();
+            $table->string('molecular_formula')->nullable();
+            $table->unsignedBigInteger('source_id')->nullable();
             $table->boolean('status')->default(1);
             $table->timestamps();
             $table->softDeletes();
+
+            // Foreign key constraint
+            $table->foreign('source_id')->references('id')->on('sources')->onDelete('set null');
         });
     }
 

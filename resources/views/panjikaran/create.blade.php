@@ -9,7 +9,11 @@
 
                 <div class="page-title-right">
                     <ol class="breadcrumb m-0">
-                        <li class="breadcrumb-item"><a href="{{ route('panjikarans.index') }}">पञ्जीकरणको सूची</a></li>
+                        <li class="breadcrumb-item">
+                            <a href="{{ route('panjikarans.index', ['checklist_id' => request('checklist_id')]) }}">
+                                पञ्जीकरणको सूची
+                            </a>
+                        </li>
                         <li class="breadcrumb-item active">थप्नुहोस्</li>
                     </ol>
                 </div>
@@ -31,25 +35,36 @@
 
                             @if($checklist->check_list_formulations->count() > 0)
                                 <div class="mt-3">
-                                    <h6><strong>सामान्य नामहरू:</strong></h6>
-                                    <div class="row">
-                                        @foreach($checklist->check_list_formulations as $formulation)
-                                            <div class="col-md-6 mb-2">
-                                                <div class="border p-2 rounded bg-light">
-                                                    <div class="d-flex justify-content-between align-items-center">
-                                                        <div>
-                                                            <strong>{{ $formulation->common_name->common_name ?? 'N/A' }}</strong>
-                                                            <br>
-                                                            <small class="text-muted">
-                                                                फॉर्मुलेशन: {{ $formulation->formulation->formulation_name ?? 'N/A' }}
-                                                                | मात्रा: {{ $formulation->ActiveIngredientValue ?? 'N/A' }} {{ $formulation->unit->unit_name ?? '' }}
-                                                            </small>
-                                                        </div>
-                                                        <span class="badge bg-primary">{{ $loop->iteration }}</span>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        @endforeach
+                                    <h6><strong>सामान्य नामहरू र रासायनिक विवरण:</strong></h6>
+                                    <div class="table-responsive">
+                                        <table class="table table-bordered table-sm">
+                                            <thead class="table-light">
+                                                <tr>
+                                                    <th>सामान्य नाम</th>
+                                                    <th>रासायनिक नाम</th>
+                                                    <th>IUPAC नाम</th>
+                                                    <th>CAS नम्बर</th>
+                                                    <th>आणविक सूत्र</th>
+                                                    <th>फॉर्मुलेशन</th>
+                                                    <th>मात्रा</th>
+                                                    <th>स्रोत</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach($checklist->check_list_formulations as $formulation)
+                                                    <tr>
+                                                        <td><strong>{{ $formulation->common_name->common_name ?? 'N/A' }}</strong></td>
+                                                        <td>{{ $formulation->common_name->rasayanik_name ?? 'N/A' }}</td>
+                                                        <td>{{ $formulation->common_name->iupac_name ?? 'N/A' }}</td>
+                                                        <td>{{ $formulation->common_name->cas_no ?? 'N/A' }}</td>
+                                                        <td>{{ $formulation->common_name->molecular_formula ?? 'N/A' }}</td>
+                                                        <td>{{ $formulation->formulation->formulation_name ?? 'N/A' }}</td>
+                                                        <td>{{ $formulation->ActiveIngredientValue ?? 'N/A' }} {{ $formulation->unit->unit_name ?? '' }}</td>
+                                                        <td>{{ $formulation->common_name->source->sourcename ?? 'N/A' }}</td>
+                                                    </tr>
+                                                @endforeach
+                                            </tbody>
+                                        </table>
                                     </div>
                                 </div>
                             @else
@@ -65,74 +80,7 @@
                         <input type="hidden" name="ChecklistID" value="{{ $checklistId ?? '' }}">
 
                         <div class="row">
-                            <!-- Basic Information - CommonNameOfPesticide field removed -->
-                            <div class="col-md-6 mb-3">
-                                <div class="form-floating">
-                                    <input type="text" class="form-control @error('ChemicalName') is-invalid @enderror"
-                                        name="ChemicalName"
-                                        value="{{ old('ChemicalName', $checklist->ChemicalName ?? '') }}" required
-                                        placeholder="रासायनिक नाम">
-                                    <label>रासायनिक नाम</label>
-                                    @error('ChemicalName')
-                                        <span class="invalid-feedback">{{ $message }}</span>
-                                    @enderror
-                                </div>
-                            </div>
-
-                            <div class="col-md-6 mb-3">
-                                <div class="form-floating">
-                                    <input type="text" class="form-control @error('IUPAC_Name') is-invalid @enderror"
-                                        name="IUPAC_Name" value="{{ old('IUPAC_Name') }}" placeholder="IUPAC नाम">
-                                    <label>IUPAC नाम</label>
-                                    @error('IUPAC_Name')
-                                        <span class="invalid-feedback">{{ $message }}</span>
-                                    @enderror
-                                </div>
-                            </div>
-
-                            <div class="col-md-6 mb-3">
-                                <div class="form-floating">
-                                    <input type="text" class="form-control @error('Cas_No') is-invalid @enderror"
-                                        name="Cas_No" value="{{ old('Cas_No') }}" placeholder="Cas No">
-                                    <label>Cas No</label>
-                                    @error('Cas_No')
-                                        <span class="invalid-feedback">{{ $message }}</span>
-                                    @enderror
-                                </div>
-                            </div>
-
-                            <div class="col-md-6 mb-3">
-                                <div class="form-floating">
-                                    <input type="text" class="form-control @error('Atomic_Formula') is-invalid @enderror"
-                                        name="Atomic_Formula" value="{{ old('Atomic_Formula') }}"
-                                        placeholder="आणविक सूत्र">
-                                    <label>आणविक सूत्र</label>
-                                    @error('Atomic_Formula')
-                                        <span class="invalid-feedback">{{ $message }}</span>
-                                    @enderror
-                                </div>
-                            </div>
-
-                            <!-- Dropdowns -->
-                            <div class="col-md-6 mb-3">
-                                <div class="form-floating">
-                                    <select class="form-select @error('SourceID') is-invalid @enderror" name="SourceID"
-                                        required>
-                                        <option value="">स्रोत छान्नुहोस्</option>
-                                        @foreach ($sources as $source)
-                                            <option value="{{ $source->id }}"
-                                                {{ old('SourceID') == $source->id ? 'selected' : '' }}>
-                                                {{ $source->sourcename }}
-                                            </option>
-                                        @endforeach
-                                    </select>
-                                    <label>स्रोत</label>
-                                    @error('SourceID')
-                                        <span class="invalid-feedback">{{ $message }}</span>
-                                    @enderror
-                                </div>
-                            </div>
-
+                            <!-- Dropdowns - Removed SourceID since it's in common_names -->
                             <div class="col-md-6 mb-3">
                                 <div class="form-floating">
                                     <select class="form-select @error('ObjectiveID') is-invalid @enderror"

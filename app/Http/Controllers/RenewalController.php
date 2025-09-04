@@ -13,15 +13,18 @@ class RenewalController extends Controller
     public function index(Request $request)
     {
         $query = Renewal::with(['checklist', 'panjikaran']);
+        $panjikaran = null;
 
         // Filter by panjikaran if provided
-        if ($request->has('panjikaran_id')) {
+        if ($request->has('panjikaran_id') && $request->panjikaran_id) {
+            $panjikaran = Panjikaran::with(['checklist.check_list_formulations.common_name.source', 'checklist.check_list_formulations.formulation', 'checklist.check_list_formulations.unit'])
+                ->findOrFail($request->panjikaran_id);
             $query->where('panjikaran_id', $request->panjikaran_id);
         }
 
         $renewals = $query->latest()->get();
 
-        return view('renewals.index', compact('renewals'));
+        return view('renewals.index', compact('renewals', 'panjikaran'));
     }
 
     public function create(Request $request)

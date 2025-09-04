@@ -218,7 +218,7 @@
             <div class="form-row">
                 <span class="form-label">१.</span>
                 <span style="margin-right: 20px;">पञ्जीकरण नं.:</span>
-                <span class="form-value">{{ $panjikaran->id ?? '..........' }}</span>
+                <span class="form-value">{{ $panjikaran->checklist->PanjikaranDecisionNo ?? '..........' }}</span>
             </div>
 
             <div class="form-row">

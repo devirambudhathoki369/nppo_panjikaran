@@ -9,7 +9,7 @@
 
                 <div class="page-title-right">
                     <ol class="breadcrumb m-0">
-                        <li class="breadcrumb-item"><a href="{{ route('panjikarans.index') }}">पञ्जीकरणको सूची</a></li>
+                        <li class="breadcrumb-item"><a href="{{ route('panjikarans.index', ['checklist_id' => $panjikaran->ChecklistID]) }}">पञ्जीकरणको सूची</a></li>
                         <li class="breadcrumb-item active">कार्यप्रवाह</li>
                     </ol>
                 </div>
@@ -423,243 +423,269 @@
                                 </div>
                             </div>
                         @elseif($currentStep == 4)
-                            <!-- HCS Details Tab -->
+                            <!-- HCS Details Tab - ONE TO ONE RELATIONSHIP -->
                             <div class="tab-pane fade show active">
                                 <h5 class="mb-3">H.C.S विवरण व्यवस्थापन</h5>
 
-                                <!-- Add New HCS Detail Form -->
-                                <div class="card mb-4">
-                                    <div class="card-body">
-                                        <h6 class="card-title">नयाँ H.C.S विवरण थप्नुहोस्</h6>
+                                @php
+                                    $existingHcsDetail = $hcsDetails->first();
+                                @endphp
 
-                                        <form action="{{ route('hcs-details.store') }}" method="POST">
-                                            @csrf
-                                            <input type="hidden" name="from_workflow" value="1">
-                                            <input type="hidden" name="checklist_id" value="{{ $panjikaran->checklist->id }}">
-                                            <input type="hidden" name="panjikaran_id" value="{{ $panjikaran->id }}">
+                                @if (!$existingHcsDetail)
+                                    <!-- Add New HCS Detail Form (Only shown if no existing record) -->
+                                    <div class="card mb-4">
+                                        <div class="card-body">
+                                            <h6 class="card-title">H.C.S विवरण थप्नुहोस्</h6>
 
-                                            <div class="row">
-                                                <div class="col-md-3">
-                                                    <div class="mb-3">
-                                                        <label for="self_life_of_the_product" class="form-label">उत्पादनको शेल्फ लाइफ</label>
-                                                        <input type="text" class="form-control" id="self_life_of_the_product"
-                                                            name="self_life_of_the_product" value="{{ old('self_life_of_the_product') }}">
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-3">
-                                                    <div class="mb-3">
-                                                        <label for="date" class="form-label">मिति</label>
-                                                        <input type="date" class="form-control" id="date"
-                                                            name="date" value="{{ old('date') }}">
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-3">
-                                                    <div class="mb-3">
-                                                        <label for="hcs_code" class="form-label">H.C.S कोड <span class="text-danger">*</span></label>
-                                                        <input type="text" class="form-control @error('hcs_code') is-invalid @enderror"
-                                                            id="hcs_code" name="hcs_code" value="{{ old('hcs_code') }}" required>
-                                                        @error('hcs_code')
-                                                        <span class="invalid-feedback" role="alert">
-                                                            <strong>{{ $message }}</strong>
-                                                        </span>
-                                                        @enderror
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-3">
-                                                    <div class="mb-3">
-                                                        <label class="form-label">&nbsp;</label>
-                                                        <button type="submit" class="btn btn-primary w-100">
-                                                            <i class="fa fa-plus"></i> थप्नुहोस्
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="row">
-                                                <div class="col-md-12">
-                                                    <div class="mb-3">
-                                                        <label for="tax_payment_bhauchar_details" class="form-label">कर भुक्तानी भौचर विवरण</label>
-                                                        <textarea class="form-control" id="tax_payment_bhauchar_details"
-                                                            name="tax_payment_bhauchar_details" rows="3">{{ old('tax_payment_bhauchar_details') }}</textarea>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </form>
-                                    </div>
-                                </div>
+                                            <form action="{{ route('hcs-details.store') }}" method="POST">
+                                                @csrf
+                                                <input type="hidden" name="from_workflow" value="1">
+                                                <input type="hidden" name="checklist_id" value="{{ $panjikaran->checklist->id }}">
+                                                <input type="hidden" name="panjikaran_id" value="{{ $panjikaran->id }}">
 
-                                <!-- HCS Details List -->
-                                <div class="table-responsive">
-                                    <table class="table table-bordered">
-                                        <thead>
-                                            <tr>
-                                                <th>S.N.</th>
-                                                <th>H.C.S कोड</th>
-                                                <th>शेल्फ लाइफ</th>
-                                                <th>कर भुक्तानी विवरण</th>
-                                                <th>मिति</th>
-                                                <th>कार्य</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            @forelse ($hcsDetails as $sn => $hcsDetail)
-                                                <tr>
-                                                    <td>{{ ++$sn }}</td>
-                                                    <td>{{ $hcsDetail->hcs_code }}</td>
-                                                    <td>{{ $hcsDetail->self_life_of_the_product ?? 'N/A' }}</td>
-                                                    <td>{{ Str::limit($hcsDetail->tax_payment_bhauchar_details, 50) ?? 'N/A' }}</td>
-                                                    <td>{{ $hcsDetail->date ? $hcsDetail->date->format('Y-m-d') : 'N/A' }}</td>
-                                                    <td>
-                                                        <a href="{{ route('hcs-details.edit', $hcsDetail->id) }}"
-                                                            class="btn btn-success btn-xs">
-                                                            <i class="bx bx-edit"></i>
-                                                        </a>
-                                                        <form action="{{ route('hcs-details.destroy', $hcsDetail->id) }}"
-                                                            method="POST" style="display: inline-block;"
-                                                            onsubmit="return confirm('तपाईं यो डाटा मेटाउन निश्चित हुनुहुन्छ?')">
-                                                            @csrf
-                                                            @method('DELETE')
-                                                            <input type="hidden" name="from_workflow" value="1">
-                                                            <button type="submit" class="btn btn-xs btn-danger">
-                                                                <i class="fa fa-trash"></i>
+                                                <div class="row">
+                                                    <div class="col-md-3">
+                                                        <div class="mb-3">
+                                                            <label for="self_life_of_the_product" class="form-label">उत्पादनको शेल्फ लाइफ</label>
+                                                            <input type="text" class="form-control" id="self_life_of_the_product"
+                                                                name="self_life_of_the_product" value="{{ old('self_life_of_the_product') }}">
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-3">
+                                                        <div class="mb-3">
+                                                            <label for="date" class="form-label">मिति</label>
+                                                            <input type="date" class="form-control" id="date"
+                                                                name="date" value="{{ old('date') }}">
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-3">
+                                                        <div class="mb-3">
+                                                            <label for="hcs_code" class="form-label">H.C.S कोड <span class="text-danger">*</span></label>
+                                                            <input type="text" class="form-control @error('hcs_code') is-invalid @enderror"
+                                                                id="hcs_code" name="hcs_code" value="{{ old('hcs_code') }}" required>
+                                                            @error('hcs_code')
+                                                            <span class="invalid-feedback" role="alert">
+                                                                <strong>{{ $message }}</strong>
+                                                            </span>
+                                                            @enderror
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-3">
+                                                        <div class="mb-3">
+                                                            <label class="form-label">&nbsp;</label>
+                                                            <button type="submit" class="btn btn-primary w-100">
+                                                                <i class="fa fa-plus"></i> थप्नुहोस्
                                                             </button>
-                                                        </form>
-                                                    </td>
-                                                </tr>
-                                            @empty
-                                                <tr>
-                                                    <td colspan="6" class="text-center">कुनै डाटा उपलब्ध छैन</td>
-                                                </tr>
-                                            @endforelse
-                                        </tbody>
-                                    </table>
-                                </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-md-12">
+                                                        <div class="mb-3">
+                                                            <label for="tax_payment_bhauchar_details" class="form-label">कर भुक्तानी भौचर विवरण</label>
+                                                            <textarea class="form-control" id="tax_payment_bhauchar_details"
+                                                                name="tax_payment_bhauchar_details" rows="3">{{ old('tax_payment_bhauchar_details') }}</textarea>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                @else
+                                    <!-- Display existing HCS Detail -->
+                                    <div class="card mb-4">
+                                        <div class="card-body">
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <h6 class="card-title mb-0">H.C.S विवरण</h6>
+                                                <div>
+                                                    <a href="{{ route('hcs-details.edit', $existingHcsDetail->id) }}"
+                                                        class="btn btn-success btn-sm">
+                                                        <i class="bx bx-edit"></i> सम्पादन गर्नुहोस्
+                                                    </a>
+                                                    <form action="{{ route('hcs-details.destroy', $existingHcsDetail->id) }}"
+                                                        method="POST" style="display: inline-block;"
+                                                        onsubmit="return confirm('तपाईं यो डाटा मेटाउन निश्चित हुनुहुन्छ?')">
+                                                        @csrf
+                                                        @method('DELETE')
+                                                        <input type="hidden" name="from_workflow" value="1">
+                                                        <button type="submit" class="btn btn-danger btn-sm">
+                                                            <i class="fa fa-trash"></i> मेट्नुहोस्
+                                                        </button>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                            <hr>
+                                            <div class="row">
+                                                <div class="col-md-3">
+                                                    <strong>H.C.S कोड:</strong>
+                                                    <p>{{ $existingHcsDetail->hcs_code }}</p>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <strong>शेल्फ लाइफ:</strong>
+                                                    <p>{{ $existingHcsDetail->self_life_of_the_product ?? 'N/A' }}</p>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <strong>मिति:</strong>
+                                                    <p>{{ $existingHcsDetail->date ? $existingHcsDetail->date->format('Y-m-d') : 'N/A' }}</p>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <strong>सिर्जना मिति:</strong>
+                                                    <p>{{ $existingHcsDetail->created_at->format('Y-m-d') }}</p>
+                                                </div>
+                                            </div>
+                                            @if($existingHcsDetail->tax_payment_bhauchar_details)
+                                                <div class="row">
+                                                    <div class="col-md-12">
+                                                        <strong>कर भुक्तानी भौचर विवरण:</strong>
+                                                        <p>{{ $existingHcsDetail->tax_payment_bhauchar_details }}</p>
+                                                    </div>
+                                                </div>
+                                            @endif
+                                        </div>
+                                    </div>
+                                @endif
                             </div>
                         @else
-                            <!-- NNSW Details Tab (Step 5) -->
+                            <!-- NNSW Details Tab (Step 5) - ONE TO ONE RELATIONSHIP -->
                             <div class="tab-pane fade show active">
                                 <h5 class="mb-3">NNSW विवरण व्यवस्थापन</h5>
 
-                                <!-- Add New NNSW Detail Form -->
-                                <div class="card mb-4">
-                                    <div class="card-body">
-                                        <h6 class="card-title">नयाँ NNSW विवरण थप्नुहोस्</h6>
+                                @php
+                                    $existingNnswDetail = $nnswDetails->first();
+                                @endphp
 
-                                        <form action="{{ route('nnsw-details.store') }}" method="POST">
-                                            @csrf
-                                            <input type="hidden" name="from_workflow" value="1">
-                                            <input type="hidden" name="checklist_id" value="{{ $panjikaran->checklist->id }}">
-                                            <input type="hidden" name="panjikaran_id" value="{{ $panjikaran->id }}">
+                                @if (!$existingNnswDetail)
+                                    <!-- Add New NNSW Detail Form (Only shown if no existing record) -->
+                                    <div class="card mb-4">
+                                        <div class="card-body">
+                                            <h6 class="card-title">NNSW विवरण थप्नुहोस्</h6>
 
-                                            <div class="row">
-                                                <div class="col-md-6">
-                                                    <div class="mb-3">
-                                                        <label for="nepal_rastriya_ekdwar_pranalima_anurodh_no" class="form-label">नेपाल राष्ट्रिय एकद्वार प्रणालीमा अनुरोध नं.</label>
-                                                        <input type="text" class="form-control" id="nepal_rastriya_ekdwar_pranalima_anurodh_no"
-                                                            name="nepal_rastriya_ekdwar_pranalima_anurodh_no" value="{{ old('nepal_rastriya_ekdwar_pranalima_anurodh_no') }}">
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <div class="mb-3">
-                                                        <label for="nepal_rastriya_ekdwar_pranalima_anurodh_date" class="form-label">नेपाल राष्ट्रिय एकद्वार प्रणालीमा अनुरोध मिति</label>
-                                                        <input type="date" class="form-control" id="nepal_rastriya_ekdwar_pranalima_anurodh_date"
-                                                            name="nepal_rastriya_ekdwar_pranalima_anurodh_date" value="{{ old('nepal_rastriya_ekdwar_pranalima_anurodh_date') }}">
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="row">
-                                                <div class="col-md-4">
-                                                    <div class="mb-3">
-                                                        <label for="company_code" class="form-label">कम्पनी कोड</label>
-                                                        <input type="text" class="form-control" id="company_code"
-                                                            name="company_code" value="{{ old('company_code') }}">
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-4">
-                                                    <div class="mb-3">
-                                                        <label for="swikrit_no" class="form-label">स्वीकृति नं.</label>
-                                                        <input type="text" class="form-control" id="swikrit_no"
-                                                            name="swikrit_no" value="{{ old('swikrit_no') }}">
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-4">
-                                                    <div class="mb-3">
-                                                        <label for="swikrit_date" class="form-label">स्वीकृति मिति</label>
-                                                        <input type="date" class="form-control" id="swikrit_date"
-                                                            name="swikrit_date" value="{{ old('swikrit_date') }}">
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="row">
-                                                <div class="col-md-8">
-                                                    <div class="mb-3">
-                                                        <label for="baidata_abadhi" class="form-label">वैधता अवधि</label>
-                                                        <input type="text" class="form-control" id="baidata_abadhi"
-                                                            name="baidata_abadhi" value="{{ old('baidata_abadhi') }}">
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-4">
-                                                    <div class="mb-3">
-                                                        <label class="form-label">&nbsp;</label>
-                                                        <button type="submit" class="btn btn-primary w-100">
-                                                            <i class="fa fa-plus"></i> थप्नुहोस्
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </form>
-                                    </div>
-                                </div>
+                                            <form action="{{ route('nnsw-details.store') }}" method="POST">
+                                                @csrf
+                                                <input type="hidden" name="from_workflow" value="1">
+                                                <input type="hidden" name="checklist_id" value="{{ $panjikaran->checklist->id }}">
+                                                <input type="hidden" name="panjikaran_id" value="{{ $panjikaran->id }}">
 
-                                <!-- NNSW Details List -->
-                                <div class="table-responsive">
-                                    <table class="table table-bordered">
-                                        <thead>
-                                            <tr>
-                                                <th>S.N.</th>
-                                                <th>अनुरोध नं.</th>
-                                                <th>अनुरोध मिति</th>
-                                                <th>कम्पनी कोड</th>
-                                                <th>स्वीकृति नं.</th>
-                                                <th>स्वीकृति मिति</th>
-                                                <th>वैधता अवधि</th>
-                                                <th>कार्य</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            @forelse ($nnswDetails as $sn => $nnswDetail)
-                                                <tr>
-                                                    <td>{{ ++$sn }}</td>
-                                                    <td>{{ $nnswDetail->nepal_rastriya_ekdwar_pranalima_anurodh_no ?? 'N/A' }}</td>
-                                                    <td>{{ $nnswDetail->nepal_rastriya_ekdwar_pranalima_anurodh_date ? $nnswDetail->nepal_rastriya_ekdwar_pranalima_anurodh_date->format('Y-m-d') : 'N/A' }}</td>
-                                                    <td>{{ $nnswDetail->company_code ?? 'N/A' }}</td>
-                                                    <td>{{ $nnswDetail->swikrit_no ?? 'N/A' }}</td>
-                                                    <td>{{ $nnswDetail->swikrit_date ? $nnswDetail->swikrit_date->format('Y-m-d') : 'N/A' }}</td>
-                                                    <td>{{ $nnswDetail->baidata_abadhi ?? 'N/A' }}</td>
-                                                    <td>
-                                                        <a href="{{ route('nnsw-details.edit', $nnswDetail->id) }}"
-                                                            class="btn btn-success btn-xs">
-                                                            <i class="bx bx-edit"></i>
-                                                        </a>
-                                                        <form action="{{ route('nnsw-details.destroy', $nnswDetail->id) }}"
-                                                            method="POST" style="display: inline-block;"
-                                                            onsubmit="return confirm('तपाईं यो डाटा मेटाउन निश्चित हुनुहुन्छ?')">
-                                                            @csrf
-                                                            @method('DELETE')
-                                                            <input type="hidden" name="from_workflow" value="1">
-                                                            <button type="submit" class="btn btn-xs btn-danger">
-                                                                <i class="fa fa-trash"></i>
+                                                <div class="row">
+                                                    <div class="col-md-6">
+                                                        <div class="mb-3">
+                                                            <label for="nepal_rastriya_ekdwar_pranalima_anurodh_no" class="form-label">नेपाल राष्ट्रिय एकद्वार प्रणालीमा अनुरोध नं.</label>
+                                                            <input type="text" class="form-control" id="nepal_rastriya_ekdwar_pranalima_anurodh_no"
+                                                                name="nepal_rastriya_ekdwar_pranalima_anurodh_no" value="{{ old('nepal_rastriya_ekdwar_pranalima_anurodh_no') }}">
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <div class="mb-3">
+                                                            <label for="nepal_rastriya_ekdwar_pranalima_anurodh_date" class="form-label">नेपाल राष्ट्रिय एकद्वार प्रणालीमा अनुरोध मिति</label>
+                                                            <input type="date" class="form-control" id="nepal_rastriya_ekdwar_pranalima_anurodh_date"
+                                                                name="nepal_rastriya_ekdwar_pranalima_anurodh_date" value="{{ old('nepal_rastriya_ekdwar_pranalima_anurodh_date') }}">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-md-4">
+                                                        <div class="mb-3">
+                                                            <label for="company_code" class="form-label">कम्पनी कोड</label>
+                                                            <input type="text" class="form-control" id="company_code"
+                                                                name="company_code" value="{{ old('company_code') }}">
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-4">
+                                                        <div class="mb-3">
+                                                            <label for="swikrit_no" class="form-label">स्वीकृति नं.</label>
+                                                            <input type="text" class="form-control" id="swikrit_no"
+                                                                name="swikrit_no" value="{{ old('swikrit_no') }}">
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-4">
+                                                        <div class="mb-3">
+                                                            <label for="swikrit_date" class="form-label">स्वीकृति मिति</label>
+                                                            <input type="date" class="form-control" id="swikrit_date"
+                                                                name="swikrit_date" value="{{ old('swikrit_date') }}">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-md-8">
+                                                        <div class="mb-3">
+                                                            <label for="baidata_abadhi" class="form-label">वैधता अवधि</label>
+                                                            <input type="text" class="form-control" id="baidata_abadhi"
+                                                                name="baidata_abadhi" value="{{ old('baidata_abadhi') }}">
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-4">
+                                                        <div class="mb-3">
+                                                            <label class="form-label">&nbsp;</label>
+                                                            <button type="submit" class="btn btn-primary w-100">
+                                                                <i class="fa fa-plus"></i> थप्नुहोस्
                                                             </button>
-                                                        </form>
-                                                    </td>
-                                                </tr>
-                                            @empty
-                                                <tr>
-                                                    <td colspan="8" class="text-center">कुनै डाटा उपलब्ध छैन</td>
-                                                </tr>
-                                            @endforelse
-                                        </tbody>
-                                    </table>
-                                </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                @else
+                                    <!-- Display existing NNSW Detail -->
+                                    <div class="card mb-4">
+                                        <div class="card-body">
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <h6 class="card-title mb-0">NNSW विवरण</h6>
+                                                <div>
+                                                    <a href="{{ route('nnsw-details.edit', $existingNnswDetail->id) }}"
+                                                        class="btn btn-success btn-sm">
+                                                        <i class="bx bx-edit"></i> सम्पादन गर्नुहोस्
+                                                    </a>
+                                                    <form action="{{ route('nnsw-details.destroy', $existingNnswDetail->id) }}"
+                                                        method="POST" style="display: inline-block;"
+                                                        onsubmit="return confirm('तपाईं यो डाटा मेटाउन निश्चित हुनुहुन्छ?')">
+                                                        @csrf
+                                                        @method('DELETE')
+                                                        <input type="hidden" name="from_workflow" value="1">
+                                                        <button type="submit" class="btn btn-danger btn-sm">
+                                                            <i class="fa fa-trash"></i> मेट्नुहोस्
+                                                        </button>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                            <hr>
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <strong>अनुरोध नं.:</strong>
+                                                    <p>{{ $existingNnswDetail->nepal_rastriya_ekdwar_pranalima_anurodh_no ?? 'N/A' }}</p>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <strong>अनुरोध मिति:</strong>
+                                                    <p>{{ $existingNnswDetail->nepal_rastriya_ekdwar_pranalima_anurodh_date ? $existingNnswDetail->nepal_rastriya_ekdwar_pranalima_anurodh_date->format('Y-m-d') : 'N/A' }}</p>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-md-4">
+                                                    <strong>कम्पनी कोड:</strong>
+                                                    <p>{{ $existingNnswDetail->company_code ?? 'N/A' }}</p>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <strong>स्वीकृति नं.:</strong>
+                                                    <p>{{ $existingNnswDetail->swikrit_no ?? 'N/A' }}</p>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <strong>स्वीकृति मिति:</strong>
+                                                    <p>{{ $existingNnswDetail->swikrit_date ? $existingNnswDetail->swikrit_date->format('Y-m-d') : 'N/A' }}</p>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <strong>वैधता अवधि:</strong>
+                                                    <p>{{ $existingNnswDetail->baidata_abadhi ?? 'N/A' }}</p>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <strong>सिर्जना मिति:</strong>
+                                                    <p>{{ $existingNnswDetail->created_at->format('Y-m-d') }}</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                @endif
                             </div>
                         @endif
                     </div>

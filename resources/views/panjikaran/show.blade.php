@@ -9,7 +9,15 @@
 
                 <div class="page-title-right">
                     <ol class="breadcrumb m-0">
-                        <li class="breadcrumb-item"><a href="{{ route('panjikarans.index') }}">पञ्जीकरणको सूची</a></li>
+                        @if($panjikaran->checklist)
+                            <li class="breadcrumb-item">
+                                <a href="{{ route('panjikarans.index', ['checklist_id' => $panjikaran->ChecklistID]) }}">पञ्जीकरणको सूची</a>
+                            </li>
+                        @else
+                            <li class="breadcrumb-item">
+                                <a href="{{ route('panjikarans.index') }}">पञ्जीकरणको सूची</a>
+                            </li>
+                        @endif
                         <li class="breadcrumb-item active">विवरण</li>
                     </ol>
                 </div>
@@ -39,9 +47,16 @@
                                         class="btn btn-warning btn-sm">
                                         <i class="fa fa-edit"></i> सम्पादन गर्नुहोस्
                                     </a>
-                                    <a href="{{ route('panjikarans.index') }}" class="btn btn-secondary btn-sm">
-                                        <i class="fa fa-arrow-left"></i> सूचीमा फिर्ता
-                                    </a>
+                                    @if($panjikaran->checklist)
+                                        <a href="{{ route('panjikarans.index', ['checklist_id' => $panjikaran->ChecklistID]) }}"
+                                            class="btn btn-secondary btn-sm">
+                                            <i class="fa fa-arrow-left"></i> सूचीमा फिर्ता
+                                        </a>
+                                    @else
+                                        <a href="{{ route('panjikarans.index', ['checklist_id' => $panjikaran->ChecklistID]) }}" class="btn btn-secondary btn-sm">
+                                            <i class="fa fa-arrow-left"></i> सूचीमा फिर्ता
+                                        </a>
+                                    @endif
                                 </div>
                             </div>
 
